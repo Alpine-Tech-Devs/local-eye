@@ -82,19 +82,19 @@ Existing starting point: `seacoast-events/` is a fresh Next.js 16 + React 19 + T
 
 ---
 
-## Phase 3 — Seed Data
+## Phase 3 — Dynamic Event Ingestion
 
-**Goal:** 40–60 realistic Seacoast events spanning the next ~3 weeks so every filter combination yields results.
+**Goal:** Populate and refresh the MVP from a small set of reliable, real Seacoast sources instead of relying on hand-authored event data.
 
-1. `supabase/seed/events.json` — hand-authored events. Cover:
-   - Every category at least twice.
-   - Every launch town at least once (South Berwick, Eliot, Kittery, York, Portsmouth, Dover, Durham, Newmarket, Exeter, Stratham, Greenland, Rye, Hampton).
-   - Mix of free / <$10 / <$20 / >$20; indoor / outdoor; morning / afternoon / evening; registration required vs. drop-in; age ranges 0–2, 2–5, 5–10, all ages.
-   - Real venues where possible (libraries, Children's Museum of NH, Seacoast Science Center, Strawbery Banke, farms, rec departments) with real source URLs.
-2. **Relative dates:** store `startOffsetDays` + `startTime` in the seed file so the seed script computes absolute `start_datetime` from "today". Keeps seed data evergreen for demos.
-3. `scripts/seed.ts` — validates with the zod schema, converts to rows, upserts via service-role client. Wire to `pnpm seed`.
+1. Select an initial 3–5 structured sources, prioritizing public iCal feeds, RSS feeds, or APIs from libraries, museums, and recreation departments. Verify source terms, stable event identifiers, and update/cancellation behavior. Do not build general-purpose scraping or AI extraction for the MVP.
+2. `lib/ingestion/types.ts` — define a `SourceAdapter` interface with source metadata, `fetchRawEvents()`, and `normalize(raw)` methods. Each adapter converts its source format into the shared event input shape.
+3. Add a small code-based source registry and implement one adapter per selected source (for example, an iCal adapter where the source supports it). Keep source-specific parsing isolated from the common ingestion pipeline.
+4. `lib/ingestion/pipeline.ts` — validate normalized records with the event Zod schema, deduplicate by `(source_id, external_id)`, and upsert through the server-only Supabase service-role client. Preserve source name and original URL; store unknown details as unknown rather than inventing age, price, or environment values.
+5. Track successful syncs and event freshness using `last_verified_at`. Treat cancellations and events missing from a feed carefully: only mark an event cancelled/unpublished after a complete successful sync from a source whose feed is authoritative for removals; never unpublish events because a fetch or parse failed. Add any required columns/indexes in a migration.
+6. `app/api/ingest/route.ts` — expose a server-only sync endpoint protected by a cron secret. Schedule it with Vercel Cron (daily to start); report per-source success/failure and avoid treating partial failures as a successful full sync. Keep secrets and service-role credentials out of client code.
+7. Keep a small relative-date fixture file for tests and local development, not as the production event catalog. Add `pnpm ingest` for a one-off local sync and document how to configure sources and run a sync.
 
-**Checkpoint:** `pnpm seed` loads data; Supabase table editor shows the events.
+**Checkpoint:** A manual sync imports current events from each configured source, repeated syncs update rather than duplicate them, and the scheduled endpoint refreshes data without exposing privileged credentials.
 
 ---
 
@@ -206,16 +206,15 @@ Existing starting point: `seacoast-events/` is a fresh Next.js 16 + React 19 + T
 
 ---
 
-## Phase 10 — Ingestion Architecture Stub (design only, minimal code)
+## Phase 10 — Ingestion Expansion (post-MVP)
 
-**Goal:** Make the "add adapters later" promise concrete without building scrapers.
+**Goal:** Expand source coverage after the initial dynamic pipeline proves reliable.
 
-1. `lib/ingestion/types.ts` — `SourceAdapter` interface: `{ id, name, fetchRawEvents(): Promise<RawEvent[]>, normalize(raw): EventInput }`.
-2. `lib/ingestion/pipeline.ts` — pure functions with TODO bodies: `dedupe()`, `categorize()`, `upsertEvents()`. Document the flow from PRODUCT.md in comments.
-3. One **manual adapter** `adapters/manualJson.ts` that reads the seed file — proving the pipeline shape end-to-end and replacing the one-off seed script.
-4. `docs/ingestion.md` — short note on adding an adapter (e.g., library calendar iCal feed first; AI extraction last).
+1. Add adapters for additional calendars and source formats based on local parent demand and source reliability.
+2. Add monitoring, retry/backoff, and alerts for stale or failing sources; provide a lightweight review workflow for records that cannot be confidently normalized.
+3. Consider deterministic webpage extraction for sources without structured feeds. Use AI extraction only as a later fallback, with validation and human review where needed.
 
-**Checkpoint:** `pnpm ingest manual` produces the same result as `pnpm seed`.
+**Checkpoint:** New sources can be added independently, and sync health is visible without disrupting existing event data.
 
 ---
 
@@ -226,16 +225,16 @@ Existing starting point: `seacoast-events/` is a fresh Next.js 16 + React 19 + T
 | 0 Foundation | ½ day | |
 | 1 Domain model | ½ day | Tests here save time later |
 | 2 Database | ½–1 day | Supabase setup included |
-| 3 Seed data | 1 day | Most time is authoring realistic events |
+| 3 Dynamic ingestion | 2–3 days | Depends on source feed quality and access |
 | 4 Query/rank | 1 day | |
 | 5 Home UI | 1–2 days | Most design iteration here |
 | 6 Results/detail | 1–2 days | |
 | 7 Favorites | ½ day | |
 | 8 Analytics | ½–1 day | |
 | 9 Polish/launch | 1–2 days | |
-| 10 Ingestion stub | ½ day | |
+| 10 Ingestion expansion | Later | Add sources after MVP launch |
 
-Roughly **8–12 working days** for a solo developer to a shareable MVP.
+Roughly **9–14 working days** for a solo developer to a shareable MVP, depending on source availability and feed quality.
 
 ---
 
@@ -244,10 +243,10 @@ Roughly **8–12 working days** for a solo developer to a shareable MVP.
 - **Filters in URL, not global state** — shareable, back-button safe, and server components can render results directly.
 - **No auth in MVP** — favorites and analytics are anonymous via `localStorage`; aligns with "repeat usage > registrations."
 - **Coarse filtering in SQL, fine ranking in TS** — keeps SQL simple and ranking testable; dataset is small.
-- **Relative seed dates** — demo always has upcoming events.
+- **Dynamic source data from the MVP** — a few reliable structured feeds provide current events; fixtures remain for tests and local development.
 - **Forward-compat DB columns** (`source_id`, `external_id`, `status`) — nearly free now, avoids a painful migration when ingestion and community submission arrive.
 - **Towns as data, not code** — satisfies "don't hard-code the market."
 
 ## Explicitly Deferred
 
-Weather, evergreen activities (`places` table), community submission + moderation, real ingestion adapters, accounts, business profiles, promoted listings, native apps.
+Weather, evergreen activities (`places` table), community submission + moderation, broad ingestion coverage and general-purpose scraping, accounts, business profiles, promoted listings, native apps.
