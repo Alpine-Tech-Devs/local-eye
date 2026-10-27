@@ -20,5 +20,6 @@ when connecting a Supabase project.
 
 ```bash
 pnpm lint
+pnpm test
 pnpm build
 ```
