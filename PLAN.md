@@ -65,20 +65,22 @@ Existing starting point: `seacoast-events/` is a fresh Next.js 16 + React 19 + T
 
 **Goal:** Events table live in Supabase, with migrations in the repo.
 
+**Status:** Complete.
+
 1. Create a Supabase project; install the Supabase CLI; `supabase init` and `supabase link`.
-2. Migration `0001_events.sql`:
+2. Events migration (created with `supabase migration new create_events`):
    - `events` table with snake_case columns matching the model (`id uuid`, `title`, `description`, `venue_name`, `address`, `city`, `state`, `latitude`, `longitude`, `start_datetime timestamptz`, `end_datetime`, `min_age`, `max_age`, `price_min numeric`, `price_max`, `is_free`, `indoor_outdoor`, `category`, `registration_required`, `registration_url`, `image_url`, `source_name`, `source_url`, `last_verified_at`, `created_at`, `updated_at`).
    - Postgres enums for `category` and `indoor_outdoor`.
    - Indexes on `start_datetime`, `(city)`, `(is_free)`, `(min_age, max_age)`.
    - `updated_at` trigger.
    - **Forward-compat columns (cheap now, needed later):** `source_id text` (adapter key), `external_id text` (dedupe key per source), `status text default 'published'` (for future moderation), unique on `(source_id, external_id)`.
-3. Migration `0002_analytics.sql`:
+3. Analytics migration (created with `supabase migration new create_analytics`):
    - `analytics_events` table: `id`, `anon_id`, `event_type` (`search`, `result_click`, `source_click`, `registration_click`, `save`), `payload jsonb`, `created_at`.
 4. Row Level Security: `events` readable by anon; `analytics_events` insert-only for anon; everything else service-role only.
 5. `lib/supabase/client.ts` (browser), `lib/supabase/server.ts` (server components / route handlers), `lib/supabase/admin.ts` (service role, scripts only).
 6. Generate DB types: `supabase gen types typescript` → `lib/supabase/database.types.ts`. Add a `mapRowToEvent()` function (snake → camel).
 
-**Checkpoint:** `supabase db push` succeeds; a server component can `select * from events` and log the result.
+**Checkpoint (complete):** `supabase db push --linked` succeeds; a server component can `select * from events` and log the result. Types are generated into `lib/supabase/database.types.ts`, and no production event seed data is required for this phase.
 
 ---
 
