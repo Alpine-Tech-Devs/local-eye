@@ -88,6 +88,8 @@ Existing starting point: `seacoast-events/` is a fresh Next.js 16 + React 19 + T
 
 **Goal:** Populate and refresh the MVP from a small set of reliable, real Seacoast sources instead of relying on hand-authored event data.
 
+**Status:** Dynamic ingestion is deferred. Events are being added manually in Supabase to bootstrap the catalog; return to this phase to build and validate automated ingestion before relying on it for ongoing updates.
+
 1. Select an initial 3–5 structured sources, prioritizing public iCal feeds, RSS feeds, or APIs from libraries, museums, and recreation departments. Verify source terms, stable event identifiers, and update/cancellation behavior. Do not build general-purpose scraping or AI extraction for the MVP.
 2. `lib/ingestion/types.ts` — define a `SourceAdapter` interface with source metadata, `fetchRawEvents()`, and `normalize(raw)` methods. Each adapter converts its source format into the shared event input shape.
 3. Add a small code-based source registry and implement one adapter per selected source (for example, an iCal adapter where the source supports it). Keep source-specific parsing isolated from the common ingestion pipeline.
@@ -104,6 +106,8 @@ Existing starting point: `seacoast-events/` is a fresh Next.js 16 + React 19 + T
 
 **Goal:** Deterministic, testable search that returns a *small* set of relevant results.
 
+**Status:** Complete.
+
 1. `lib/events/query.ts` — `searchEvents(filters)`:
    - Push coarse filters to Postgres: date range, `is_free`/price, `indoor_outdoor`, age overlap (`min_age <= childAge <= max_age`, nulls = all ages), `status = 'published'`.
    - Apply in TypeScript: time-of-day window on `start_datetime`, distance via haversine from origin, then ranking.
@@ -117,7 +121,7 @@ Existing starting point: `seacoast-events/` is a fresh Next.js 16 + React 19 + T
 3. Return top **N = 8** by default, with a "show more" that reveals the rest. This enforces the "6 good things, not 147" principle.
 4. Empty-state logic: if < 3 results, compute the relaxed suggestions (widen distance, drop time-of-day) and return them labeled, so the UI can say "Nothing exact — here's what's nearby if you're flexible."
 
-**Checkpoint:** Unit tests for ranking order and empty-state relaxation.
+**Checkpoint (complete):** Unit tests cover ranking, filter behavior, and relaxed distance/time suggestions. Search returns all ranked exact matches with the first 8 marked as the initial results; relaxed suggestions are provided when fewer than 3 exact matches exist.
 
 ---
 
