@@ -112,6 +112,24 @@ describe("searchEvents", () => {
     expect(requestedUrls[0].searchParams.get("or")).toContain("is_free");
   });
 
+  it("supports limiting the initial suggestions to three", async () => {
+    mockSupabaseRows(
+      Array.from({ length: 5 }, (_, index) => ({
+        ...EVENT_ROW,
+        id: `00000000-0000-4000-8000-${String(index + 1).padStart(12, "0")}`,
+      })),
+    );
+
+    const result = await searchEvents(makeFilters(), {
+      now: NOW,
+      limit: 3,
+    });
+
+    expect(result.initialResults).toHaveLength(3);
+    expect(result.totalResults).toBe(5);
+    expect(result.hasMore).toBe(true);
+  });
+
   it("returns additional nearby events as relaxed suggestions when exact results are sparse", async () => {
     const fartherEvent = {
       ...EVENT_ROW,

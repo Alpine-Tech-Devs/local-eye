@@ -129,21 +129,19 @@ Existing starting point: `seacoast-events/` is a fresh Next.js 16 + React 19 + T
 
 **Goal:** Mobile-first home page that asks "What should we do?" and gets to results in one tap.
 
-1. `app/layout.tsx` — app shell: top bar (logo, Saved link), bottom-safe padding, `viewport` meta, light/dark via Tailwind.
-2. `components/search/SearchForm.tsx` (client component):
-   - Headline **"What should we do?"**
-   - Child age: stepper or chips (`<1`, `1`, `2`, … `12+`).
-   - Date: segmented control (Today / Tomorrow / This weekend / Pick a date → native `<input type="date">`).
-   - Time: Morning / Afternoon / Evening / Anytime.
-   - Distance: slider or chips (10 / 15 / 25 / 40 mi) + "Where from?" town picker (defaults to last used, persisted in `localStorage`).
-   - Budget: Free / Under $10 / Under $20 / Any.
-   - Environment: Indoor / Outdoor / Either.
-   - Submit → `router.push('/results?…')` with serialized filters.
-   - Remember last filters in `localStorage` so returning users get one-tap search.
-3. Design system basics: `components/ui/` — `Chip`, `SegmentedControl`, `Button`, `Card`, `Badge`. Keep it to what's used.
-4. Large tap targets (≥44px), single-column layout, sticky submit button on mobile.
+**Status:** Complete. The home page starts with only the intro and Start button, then presents a three-question wizard with progress. Submitting the third question navigates to `/results`, which displays no more than three suggestions.
 
-**Checkpoint:** Form works on a phone-sized viewport; URL reflects selections.
+1. `app/layout.tsx` — app shell: clean white-and-blue top bar (logo, Saved link), bottom-safe padding, `viewport` meta.
+2. `components/search/SearchForm.tsx` (client component):
+   - Intro: **"Looking for something to do in Seacoast, Maine & New Hampshire? Answer 3 questions and get local suggestions."**
+   - Three steps: child age; date and time; starting town and maximum distance.
+   - Budget and environment under a collapsed **More options** section.
+   - Submit after the third question → `router.push('/results?…')` with serialized filters.
+   - Remember last filters in `localStorage` so returning users get one-tap search.
+3. Design system basics: `components/ui/` — `Chip`, `SegmentedControl`, and `Button`.
+4. Large tap targets (≥44px), clear spacing, centered readable content on desktop, and a sticky submit button on mobile.
+
+**Checkpoint (complete):** Only the intro and Start button appear initially; the three questions display one at a time with progress. At a phone-sized viewport there is no horizontal overflow, saved selections are restored, and submission navigates with serialized filters.
 
 ---
 
@@ -151,8 +149,10 @@ Existing starting point: `seacoast-events/` is a fresh Next.js 16 + React 19 + T
 
 **Goal:** Scannable result cards and a detail page that always links back to the source.
 
+**Status:** In progress. A basic results page is implemented for the three-question search flow and displays at most three suggestions; event detail pages and the remaining planned card features are still outstanding.
+
 1. `app/results/page.tsx` (server component): parse filters from `searchParams`, call `searchEvents`, render.
-   - Summary line: "6 things for your 2-year-old · Saturday morning · within 25 mi of Portsmouth" with an **Edit** link back to `/` preserving params.
+   - Summary line for the submitted answers with an **Edit** link back to `/` preserving params. Show no more than three exact or relaxed suggestions.
    - `Suspense` + skeleton cards for loading.
 2. `components/events/EventCard.tsx`:
    - Image (or category-colored placeholder), title, venue · town, date + time range, age badge, price badge (**Free** highlighted), indoor/outdoor icon, distance ("~12 mi"), "Registration required" badge, save button.

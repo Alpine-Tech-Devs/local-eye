@@ -1,21 +1,24 @@
-import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { SearchForm } from "@/components/search/SearchForm";
+import {
+  DEFAULT_SEARCH_FILTERS,
+  parseFiltersFromSearchParams,
+} from "@/lib/events/filters";
 
-export default async function Home() {
-  const supabase = await createSupabaseServerClient();
-  const { data: events, error } = await supabase
-    .from("events")
-    .select("*")
-    .limit(1);
+interface HomePageProps {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}
 
-  if (error) {
-    throw new Error("Unable to query Supabase events.", { cause: error });
-  }
-
-  console.info("Supabase events query succeeded.", { rowCount: events.length });
+export default async function Home({ searchParams }: HomePageProps) {
+  const params = await searchParams;
+  const hasUrlFilters = Object.keys(params).length > 0;
+  const initialFilters = hasUrlFilters
+    ? parseFiltersFromSearchParams(params)
+    : DEFAULT_SEARCH_FILTERS;
 
   return (
-    <main className="flex min-h-screen items-center justify-center">
-      <h1 className="text-3xl font-semibold">Local Eye</h1>
-    </main>
+    <SearchForm
+      hasUrlFilters={hasUrlFilters}
+      initialFilters={initialFilters}
+    />
   );
 }
