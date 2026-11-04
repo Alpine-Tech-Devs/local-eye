@@ -1,0 +1,253 @@
+import type { Metadata } from "next";
+import {
+  ArrowLeft,
+  CalendarDays,
+  ExternalLink,
+  MapPin,
+  Ticket,
+} from "lucide-react";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+
+import { SaveButton } from "@/components/events/SaveButton";
+import { SiteHeader } from "@/components/SiteHeader";
+import { getPublishedEvent } from "@/lib/events/get-published-event";
+import { EVENT_TIME_ZONE } from "@/lib/events/time";
+
+interface EventPageProps {
+  params: Promise<{ id: string }>;
+}
+
+function formatEventDate(startDateTime: string, endDateTime: string | null) {
+  const start = new Date(startDateTime);
+  const date = new Intl.DateTimeFormat("en-US", {
+    weekday: "long",
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+    timeZone: EVENT_TIME_ZONE,
+  }).format(start);
+  const startTime = new Intl.DateTimeFormat("en-US", {
+    hour: "numeric",
+    minute: "2-digit",
+    timeZone: EVENT_TIME_ZONE,
+  }).format(start);
+
+  if (!endDateTime) return `${date} · ${startTime}`;
+  const endTime = new Intl.DateTimeFormat("en-US", {
+    hour: "numeric",
+    minute: "2-digit",
+    timeZone: EVENT_TIME_ZONE,
+  }).format(new Date(endDateTime));
+  return `${date} · ${startTime}–${endTime}`;
+}
+
+function formatVerifiedDate(value: string) {
+  return new Intl.DateTimeFormat("en-US", {
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+    timeZone: EVENT_TIME_ZONE,
+  }).format(new Date(value));
+}
+
+export async function generateMetadata({
+  params,
+}: EventPageProps): Promise<Metadata> {
+  const { id } = await params;
+  const event = await getPublishedEvent(id);
+
+  if (!event) return { title: "Event not found | Local Eye" };
+
+  return {
+    title: `${event.title} | Local Eye`,
+    description:
+      event.description ??
+      `${event.title} at ${event.venueName} in ${event.city}, ${event.state}.`,
+    openGraph: {
+      title: `${event.title} | Local Eye`,
+      description:
+        event.description ??
+        `${event.title} at ${event.venueName} in ${event.city}, ${event.state}.`,
+    },
+  };
+}
+
+export default async function EventPage({ params }: EventPageProps) {
+  const { id } = await params;
+  const event = await getPublishedEvent(id);
+  if (!event) notFound();
+
+  const mapQuery = event.address
+    ? `${event.venueName}, ${event.address}, ${event.city}, ${event.state}`
+    : `${event.latitude},${event.longitude}`;
+  const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mapQuery)}`;
+
+  return (
+    <div className="min-h-screen bg-white text-slate-900">
+      <SiteHeader />
+      <main className="mx-auto max-w-3xl px-5 pb-12 pt-8 sm:px-8 sm:pt-12">
+        <Link
+          className="inline-flex min-h-11 items-center gap-2 text-sm font-medium text-blue-700 hover:text-blue-900 focus-visible:outline-2 focus-visible:outline-blue-700"
+          href="/"
+        >
+          <ArrowLeft aria-hidden="true" className="size-4" />
+          Back to search
+        </Link>
+
+        <article className="mt-5 overflow-hidden rounded-2xl border border-slate-200 bg-white">
+          <div
+            aria-hidden="true"
+            className="h-2 bg-gradient-to-r from-blue-200 via-sky-300 to-blue-500"
+          />
+          <div className="p-5 sm:p-8">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <p className="text-sm font-semibold text-blue-700">
+                  {event.category}
+                </p>
+                <h1 className="mt-2 text-2xl font-semibold tracking-tight text-slate-950 sm:text-3xl">
+                  {event.title}
+                </h1>
+                <p className="mt-2 text-base text-slate-600">
+                  {event.venueName} · {event.city}, {event.state}
+                </p>
+              </div>
+              <SaveButton eventId={event.id} />
+            </div>
+
+            <dl className="mt-7 grid gap-x-6 gap-y-5 border-y border-slate-100 py-6 sm:grid-cols-2">
+              <div>
+                <dt className="flex items-center gap-2 text-sm font-medium text-slate-600">
+                  <CalendarDays
+                    aria-hidden="true"
+                    className="size-4 text-blue-700"
+                  />
+                  When
+                </dt>
+                <dd className="mt-2 text-sm leading-6 text-slate-900">
+                  {formatEventDate(event.startDateTime, event.endDateTime)}
+                </dd>
+              </div>
+              <div>
+                <dt className="flex items-center gap-2 text-sm font-medium text-slate-600">
+                  <Ticket aria-hidden="true" className="size-4 text-blue-700" />
+                  Price
+                </dt>
+                <dd className="mt-2 text-sm text-slate-900">
+                  {event.isFree
+                    ? "Free"
+                    : event.priceMin !== null && event.priceMax !== null
+                      ? event.priceMin === event.priceMax
+                        ? `$${event.priceMin}`
+                        : `$${event.priceMin}–$${event.priceMax}`
+                      : event.priceMin !== null
+                        ? `From $${event.priceMin}`
+                        : event.priceMax !== null
+                          ? `Up to $${event.priceMax}`
+                          : "Price not listed"}
+                </dd>
+              </div>
+              <div>
+                <dt className="text-sm font-medium text-slate-600">Ages</dt>
+                <dd className="mt-2 text-sm text-slate-900">
+                  {event.minAge === null && event.maxAge === null
+                    ? "All ages"
+                    : event.minAge === null
+                      ? `Up to age ${event.maxAge}`
+                      : event.maxAge === null
+                        ? `Ages ${event.minAge}+`
+                        : event.minAge === event.maxAge
+                          ? `Age ${event.minAge}`
+                          : `Ages ${event.minAge}–${event.maxAge}`}
+                </dd>
+              </div>
+              <div>
+                <dt className="text-sm font-medium text-slate-600">Setting</dt>
+                <dd className="mt-2 text-sm capitalize text-slate-900">
+                  {event.indoorOutdoor}
+                </dd>
+              </div>
+            </dl>
+
+            {event.description && (
+              <section className="mt-7">
+                <h2 className="text-lg font-semibold text-slate-950">
+                  About this event
+                </h2>
+                <p className="mt-3 whitespace-pre-line text-sm leading-7 text-slate-700">
+                  {event.description}
+                </p>
+              </section>
+            )}
+
+            <section className="mt-7">
+              <h2 className="text-lg font-semibold text-slate-950">Location</h2>
+              <p className="mt-2 flex items-start gap-2 text-sm leading-6 text-slate-700">
+                <MapPin
+                  aria-hidden="true"
+                  className="mt-1 size-4 shrink-0 text-blue-700"
+                />
+                <span>
+                  {event.venueName}
+                  {event.address && (
+                    <>
+                      <br />
+                      {event.address}
+                    </>
+                  )}
+                  <br />
+                  {event.city}, {event.state}
+                </span>
+              </p>
+              <a
+                className="mt-3 inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-blue-700 underline decoration-blue-200 underline-offset-4 hover:text-blue-900 focus-visible:outline-2 focus-visible:outline-blue-700"
+                href={mapUrl}
+                rel="noreferrer"
+                target="_blank"
+              >
+                Open in Google Maps
+                <ExternalLink aria-hidden="true" className="size-4" />
+              </a>
+            </section>
+
+            <section className="mt-7 flex flex-wrap gap-3">
+              {event.registrationUrl ? (
+                <a
+                  className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-blue-700 px-5 text-sm font-semibold text-white hover:bg-blue-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700"
+                  href={event.registrationUrl}
+                  rel="noreferrer"
+                  target="_blank"
+                >
+                  {event.registrationRequired
+                    ? "Register for this event"
+                    : "More information"}
+                  <ExternalLink aria-hidden="true" className="size-4" />
+                </a>
+              ) : event.registrationRequired ? (
+                <p className="text-sm leading-6 text-slate-600">
+                  Registration is required. Check the organizer’s source for
+                  registration details.
+                </p>
+              ) : null}
+              <a
+                className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg border border-slate-300 px-5 text-sm font-semibold text-slate-700 hover:border-blue-300 hover:bg-blue-50 hover:text-blue-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700"
+                href={event.sourceUrl}
+                rel="noreferrer"
+                target="_blank"
+              >
+                View original source
+                <ExternalLink aria-hidden="true" className="size-4" />
+              </a>
+            </section>
+            <p className="mt-5 text-xs leading-5 text-slate-500">
+              Source: {event.sourceName}
+              {event.lastVerifiedAt &&
+                ` · Last verified ${formatVerifiedDate(event.lastVerifiedAt)}`}
+            </p>
+          </div>
+        </article>
+      </main>
+    </div>
+  );
+}

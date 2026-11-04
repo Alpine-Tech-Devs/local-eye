@@ -104,7 +104,7 @@ Existing starting point: `seacoast-events/` is a fresh Next.js 16 + React 19 + T
 
 ## Phase 4 — Query, Filter & Rank Logic
 
-**Goal:** Deterministic, testable search that returns a *small* set of relevant results.
+**Goal:** Deterministic, testable search that returns a _small_ set of relevant results.
 
 **Status:** Complete.
 
@@ -149,20 +149,20 @@ Existing starting point: `seacoast-events/` is a fresh Next.js 16 + React 19 + T
 
 **Goal:** Scannable result cards and a detail page that always links back to the source.
 
-**Status:** In progress. A basic results page is implemented for the three-question search flow and displays at most three suggestions; event detail pages and the remaining planned card features are still outstanding.
+**Status:** Complete. Results, reusable event cards, loading and empty states, flexible suggestions, and published-event detail pages are implemented.
 
 1. `app/results/page.tsx` (server component): parse filters from `searchParams`, call `searchEvents`, render.
    - Summary line for the submitted answers with an **Edit** link back to `/` preserving params. Show no more than three exact or relaxed suggestions.
-   - `Suspense` + skeleton cards for loading.
+   - Route-level loading skeleton while results load.
 2. `components/events/EventCard.tsx`:
-   - Image (or category-colored placeholder), title, venue · town, date + time range, age badge, price badge (**Free** highlighted), indoor/outdoor icon, distance ("~12 mi"), "Registration required" badge, save button.
+   - Category-colored placeholder, title, venue · town, date + time range, age and price, indoor/outdoor, distance, registration badge, event detail link, and save button.
 3. `app/events/[id]/page.tsx`:
    - Everything on the card plus full description, address (link to Apple/Google Maps), registration button, **"View original source"** button, source name, "Last verified" date.
    - `generateMetadata` for shareable titles.
-4. Relaxed-results section when exact matches are thin (from Phase 4).
-5. Empty state copy that stays on-brand and offers one-tap widening (e.g., "Try 40 miles" / "Any time").
+4. Separate flexible suggestions when exact matches are thin; never show more than three cards total.
+5. Empty state offers one-tap distance and time widening.
 
-**Checkpoint:** Full flow: home → results → detail → source link opens organizer's site.
+**Checkpoint (complete):** Full flow: home → results → event detail → source link opens organizer's site. Saved events persist locally and appear on the Saved page.
 
 ---
 
@@ -170,7 +170,9 @@ Existing starting point: `seacoast-events/` is a fresh Next.js 16 + React 19 + T
 
 **Goal:** Favorites without requiring accounts (repeat usage > registrations).
 
-1. `lib/saved/useSavedEvents.ts` — `localStorage`-backed hook (array of event IDs), hydrated safely to avoid SSR mismatch.
+**Status:** Complete. Saved IDs use localStorage and the Saved page groups upcoming and past events.
+
+1. `components/events/SaveButton.tsx` — localStorage-backed event IDs with an external-store subscription to avoid SSR mismatch and sync saved cards.
 2. Heart toggle on `EventCard` and detail page.
 3. `app/saved/page.tsx` — fetch saved IDs from storage, load events by ID, show cards; past events grouped under "Past".
 4. Note for later: when auth is added, migrate `localStorage` favorites to a `saved_events` table on first login.
@@ -226,19 +228,19 @@ Existing starting point: `seacoast-events/` is a fresh Next.js 16 + React 19 + T
 
 ## Suggested Sequencing & Effort
 
-| Phase | Est. effort | Notes |
-|---|---|---|
-| 0 Foundation | ½ day | |
-| 1 Domain model | ½ day | Tests here save time later |
-| 2 Database | ½–1 day | Supabase setup included |
-| 3 Dynamic ingestion | 2–3 days | Depends on source feed quality and access |
-| 4 Query/rank | 1 day | |
-| 5 Home UI | 1–2 days | Most design iteration here |
-| 6 Results/detail | 1–2 days | |
-| 7 Favorites | ½ day | |
-| 8 Analytics | ½–1 day | |
-| 9 Polish/launch | 1–2 days | |
-| 10 Ingestion expansion | Later | Add sources after MVP launch |
+| Phase                  | Est. effort | Notes                                     |
+| ---------------------- | ----------- | ----------------------------------------- |
+| 0 Foundation           | ½ day       |                                           |
+| 1 Domain model         | ½ day       | Tests here save time later                |
+| 2 Database             | ½–1 day     | Supabase setup included                   |
+| 3 Dynamic ingestion    | 2–3 days    | Depends on source feed quality and access |
+| 4 Query/rank           | 1 day       |                                           |
+| 5 Home UI              | 1–2 days    | Most design iteration here                |
+| 6 Results/detail       | 1–2 days    |                                           |
+| 7 Favorites            | ½ day       |                                           |
+| 8 Analytics            | ½–1 day     |                                           |
+| 9 Polish/launch        | 1–2 days    |                                           |
+| 10 Ingestion expansion | Later       | Add sources after MVP launch              |
 
 Roughly **9–14 working days** for a solo developer to a shareable MVP, depending on source availability and feed quality.
 
