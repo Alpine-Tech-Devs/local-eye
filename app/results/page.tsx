@@ -113,11 +113,12 @@ export default async function ResultsPage({ searchParams }: ResultsPageProps) {
                 {search.totalResults === 1 ? "Your match" : "Best matches"}
               </h2>
               <div className="space-y-4">
-                {exactResults.map(({ event, distanceMiles }) => (
+                {exactResults.map(({ event, distanceMiles }, index) => (
                   <EventCard
                     distanceMiles={distanceMiles}
                     event={event}
                     key={event.id}
+                    resultPosition={index + 1}
                   />
                 ))}
               </div>
@@ -138,12 +139,13 @@ export default async function ResultsPage({ searchParams }: ResultsPageProps) {
                 These options broaden the distance and time of day.
               </p>
               <div className="space-y-4">
-                {flexibleResults.map(({ event, distanceMiles }) => (
+                {flexibleResults.map(({ event, distanceMiles }, index) => (
                   <EventCard
                     distanceMiles={distanceMiles}
                     event={event}
                     flexible
                     key={event.id}
+                    resultPosition={exactResults.length + index + 1}
                   />
                 ))}
               </div>

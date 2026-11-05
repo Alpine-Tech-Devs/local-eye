@@ -185,6 +185,8 @@ Existing starting point: `seacoast-events/` is a fresh Next.js 16 + React 19 + T
 
 **Goal:** Measure the success metric — do parents come back?
 
+**Status:** Migrations applied locally and to production. Anonymous tracking, the validated insert endpoint, event instrumentation, and private SQL summary views are implemented. Production migration history confirms both analytics migrations. Live event insertion and SQL view queries still need verification; direct production SQL queries failed because the CLI temporary database login rejected its password.
+
 1. `lib/analytics/anonId.ts` — generate a UUID in `localStorage` on first visit (no PII).
 2. `lib/analytics/track.ts` — `track(eventType, payload)` → `POST /api/analytics` (route handler inserts into `analytics_events` with anon client; fire-and-forget with `navigator.sendBeacon` fallback).
 3. Instrument:
@@ -194,8 +196,9 @@ Existing starting point: `seacoast-events/` is a fresh Next.js 16 + React 19 + T
    - `save` / `unsave`
    - `session_start` (to derive returning users)
 4. `supabase/views/analytics_summary.sql` — a few SQL views: unique users, searches, returning users (anon_id seen on ≥2 distinct days), searches per returning user, clicks per search. Query in Supabase dashboard — no admin UI needed yet.
+5. Migrations are applied locally and to production. Verify analytics inserts and query `private.analytics_overview` in the Supabase SQL Editor.
 
-**Checkpoint:** Events appear in `analytics_events`; views return sensible numbers.
+**Checkpoint:** Migrations are applied to local and production databases; live analytics event and view verification remains pending.
 
 ---
 

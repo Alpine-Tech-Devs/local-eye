@@ -8,6 +8,7 @@ import type { FormEvent } from "react";
 
 import { Button } from "@/components/ui/Button";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
+import { trackAnalyticsEvent } from "@/lib/analytics/track";
 import { TOWNS } from "@/lib/geo/towns";
 import {
   BUDGET_OPTIONS,
@@ -74,10 +75,7 @@ function getStoredFilters(): SearchFilters | null {
   return null;
 }
 
-export function SearchForm({
-  initialFilters,
-  hasUrlFilters,
-}: SearchFormProps) {
+export function SearchForm({ initialFilters, hasUrlFilters }: SearchFormProps) {
   const router = useRouter();
   const [filters, setFilters] = useState(initialFilters);
   const [step, setStep] = useState(0);
@@ -131,6 +129,16 @@ export function SearchForm({
       console.warn("Could not save search filters for next time.", error);
     }
 
+    trackAnalyticsEvent("search", {
+      filters: {
+        ...parsed.data,
+        origin:
+          typeof parsed.data.origin === "string"
+            ? parsed.data.origin
+            : "custom",
+      },
+    });
+
     const params = filtersToSearchParams(parsed.data);
     startTransition(() => router.push(`/results?${params.toString()}`));
   }
@@ -169,7 +177,8 @@ export function SearchForm({
         {step === 0 ? (
           <section className="max-w-2xl">
             <h1 className="text-3xl font-semibold leading-tight tracking-tight text-slate-950 sm:text-4xl">
-              Looking for something to do in Seacoast, Maine &amp; New Hampshire?
+              Looking for something to do in Seacoast, Maine &amp; New
+              Hampshire?
             </h1>
             <p className="mt-4 text-base leading-7 text-slate-600 sm:text-lg">
               Answer 3 questions and get local suggestions.
@@ -203,10 +212,14 @@ export function SearchForm({
 
             <form
               className="min-h-[22rem]"
-              onSubmit={step === 3 ? submitSearch : (event) => {
-                event.preventDefault();
-                goToNextStep();
-              }}
+              onSubmit={
+                step === 3
+                  ? submitSearch
+                  : (event) => {
+                      event.preventDefault();
+                      goToNextStep();
+                    }
+              }
             >
               {step === 1 && (
                 <fieldset>
@@ -392,7 +405,10 @@ export function SearchForm({
               )}
 
               {validationMessage && (
-                <p className="mt-5 text-sm font-medium text-red-700" role="alert">
+                <p
+                  className="mt-5 text-sm font-medium text-red-700"
+                  role="alert"
+                >
                   {validationMessage}
                 </p>
               )}

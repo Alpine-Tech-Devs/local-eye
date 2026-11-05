@@ -10,6 +10,7 @@ import Link from "next/link";
 
 import type { Event } from "@/lib/events/types";
 import { EVENT_TIME_ZONE } from "@/lib/events/time";
+import { TrackedAnchor, TrackedLink } from "@/components/analytics/TrackedLink";
 import { SaveButton } from "./SaveButton";
 
 const CATEGORY_STYLES: Record<string, string> = {
@@ -76,12 +77,14 @@ export interface EventCardProps {
   event: Event;
   distanceMiles?: number;
   flexible?: boolean;
+  resultPosition?: number;
 }
 
 export function EventCard({
   event,
   distanceMiles,
   flexible = false,
+  resultPosition,
 }: EventCardProps) {
   const SettingIcon =
     event.indoorOutdoor === "indoor"
@@ -113,12 +116,23 @@ export function EventCard({
               </p>
             )}
             <h2 className="text-lg font-semibold leading-snug text-slate-950">
-              <Link
-                className="rounded-sm hover:text-blue-800 focus-visible:outline-2 focus-visible:outline-blue-700"
-                href={`/events/${event.id}`}
-              >
-                {event.title}
-              </Link>
+              {resultPosition ? (
+                <TrackedLink
+                  className="rounded-sm hover:text-blue-800 focus-visible:outline-2 focus-visible:outline-blue-700"
+                  eventType="result_click"
+                  href={`/events/${event.id}`}
+                  payload={{ eventId: event.id, position: resultPosition }}
+                >
+                  {event.title}
+                </TrackedLink>
+              ) : (
+                <Link
+                  className="rounded-sm hover:text-blue-800 focus-visible:outline-2 focus-visible:outline-blue-700"
+                  href={`/events/${event.id}`}
+                >
+                  {event.title}
+                </Link>
+              )}
             </h2>
             <p className="mt-1 text-sm text-slate-600">
               {event.venueName} · {event.city}, {event.state}
@@ -182,21 +196,34 @@ export function EventCard({
         )}
 
         <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2 border-t border-slate-100 pt-3">
-          <Link
-            className="inline-flex min-h-11 items-center text-sm font-semibold text-blue-700 underline decoration-blue-200 underline-offset-4 hover:text-blue-900 focus-visible:outline-2 focus-visible:outline-blue-700"
-            href={`/events/${event.id}`}
-          >
-            Event details
-          </Link>
-          <a
+          {resultPosition ? (
+            <TrackedLink
+              className="inline-flex min-h-11 items-center text-sm font-semibold text-blue-700 underline decoration-blue-200 underline-offset-4 hover:text-blue-900 focus-visible:outline-2 focus-visible:outline-blue-700"
+              eventType="result_click"
+              href={`/events/${event.id}`}
+              payload={{ eventId: event.id, position: resultPosition }}
+            >
+              Event details
+            </TrackedLink>
+          ) : (
+            <Link
+              className="inline-flex min-h-11 items-center text-sm font-semibold text-blue-700 underline decoration-blue-200 underline-offset-4 hover:text-blue-900 focus-visible:outline-2 focus-visible:outline-blue-700"
+              href={`/events/${event.id}`}
+            >
+              Event details
+            </Link>
+          )}
+          <TrackedAnchor
             className="inline-flex min-h-11 items-center gap-2 text-sm font-medium text-slate-600 hover:text-blue-800 focus-visible:outline-2 focus-visible:outline-blue-700"
             href={event.sourceUrl}
             rel="noreferrer"
             target="_blank"
+            eventId={event.id}
+            eventType="source_click"
           >
             Original source
             <ExternalLink aria-hidden="true" className="size-4" />
-          </a>
+          </TrackedAnchor>
         </div>
       </div>
     </article>

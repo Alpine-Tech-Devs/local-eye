@@ -3,6 +3,8 @@
 import { Heart } from "lucide-react";
 import { useState, useSyncExternalStore } from "react";
 
+import { trackAnalyticsEvent } from "@/lib/analytics/track";
+
 export const SAVED_EVENTS_KEY = "local-eye:saved-events";
 export const SAVED_EVENTS_CHANGED_EVENT = "local-eye:saved-events-changed";
 
@@ -65,6 +67,7 @@ export function SaveButton({ eventId }: { eventId: string }) {
         JSON.stringify(nextSavedIds),
       );
       setSaveError(null);
+      trackAnalyticsEvent(isSaved ? "unsave" : "save", { eventId });
       window.dispatchEvent(new Event(SAVED_EVENTS_CHANGED_EVENT));
     } catch (error) {
       console.error("Could not save this event on this device.", error);

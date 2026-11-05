@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { SessionStartTracker } from "@/components/analytics/SessionStartTracker";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -15,7 +16,10 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en">
-      <body className="min-h-screen antialiased">{children}</body>
+      <body className="min-h-screen antialiased">
+        <SessionStartTracker />
+        {children}
+      </body>
     </html>
   );
 }

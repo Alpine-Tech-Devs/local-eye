@@ -9,6 +9,7 @@ import {
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { TrackedAnchor } from "@/components/analytics/TrackedLink";
 import { SaveButton } from "@/components/events/SaveButton";
 import { SiteHeader } from "@/components/SiteHeader";
 import { getPublishedEvent } from "@/lib/events/get-published-event";
@@ -213,32 +214,36 @@ export default async function EventPage({ params }: EventPageProps) {
 
             <section className="mt-7 flex flex-wrap gap-3">
               {event.registrationUrl ? (
-                <a
+                <TrackedAnchor
                   className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-blue-700 px-5 text-sm font-semibold text-white hover:bg-blue-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700"
                   href={event.registrationUrl}
                   rel="noreferrer"
                   target="_blank"
+                  eventId={event.id}
+                  eventType="registration_click"
                 >
                   {event.registrationRequired
                     ? "Register for this event"
                     : "More information"}
                   <ExternalLink aria-hidden="true" className="size-4" />
-                </a>
+                </TrackedAnchor>
               ) : event.registrationRequired ? (
                 <p className="text-sm leading-6 text-slate-600">
                   Registration is required. Check the organizer’s source for
                   registration details.
                 </p>
               ) : null}
-              <a
+              <TrackedAnchor
                 className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg border border-slate-300 px-5 text-sm font-semibold text-slate-700 hover:border-blue-300 hover:bg-blue-50 hover:text-blue-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700"
                 href={event.sourceUrl}
                 rel="noreferrer"
                 target="_blank"
+                eventId={event.id}
+                eventType="source_click"
               >
                 View original source
                 <ExternalLink aria-hidden="true" className="size-4" />
-              </a>
+              </TrackedAnchor>
             </section>
             <p className="mt-5 text-xs leading-5 text-slate-500">
               Source: {event.sourceName}

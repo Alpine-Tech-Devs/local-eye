@@ -148,6 +148,8 @@ export type Database = {
         | "source_click"
         | "registration_click"
         | "save"
+        | "unsave"
+        | "session_start"
       event_category:
         | "Storytime"
         | "Museum"
@@ -297,6 +299,8 @@ export const Constants = {
         "source_click",
         "registration_click",
         "save",
+        "unsave",
+        "session_start",
       ],
       event_category: [
         "Storytime",
