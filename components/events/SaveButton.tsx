@@ -5,8 +5,8 @@ import { useState, useSyncExternalStore } from "react";
 
 import { trackAnalyticsEvent } from "@/lib/analytics/track";
 
-export const SAVED_EVENTS_KEY = "local-eye:saved-events";
-export const SAVED_EVENTS_CHANGED_EVENT = "local-eye:saved-events-changed";
+export const SAVED_EVENTS_KEY = "little-plans:saved-events";
+export const SAVED_EVENTS_CHANGED_EVENT = "little-plans:saved-events-changed";
 
 export function readSavedEventIds(): string[] {
   try {
@@ -80,13 +80,13 @@ export function SaveButton({ eventId }: { eventId: string }) {
       <button
         aria-label={isSaved ? "Remove from saved events" : "Save event"}
         aria-pressed={isSaved}
-        className="inline-flex size-11 items-center justify-center rounded-full border border-slate-200 text-slate-500 transition-colors hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700"
+        className="inline-flex size-11 items-center justify-center rounded-full border border-slate-200 text-slate-500 transition-colors hover:border-orange-300 hover:bg-orange-50 hover:text-orange-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-500"
         onClick={toggleSaved}
         type="button"
       >
         <Heart
           aria-hidden="true"
-          className={`size-5 ${isSaved ? "fill-blue-700 text-blue-700" : ""}`}
+          className={`size-5 ${isSaved ? "fill-orange-500 text-orange-500" : ""}`}
         />
       </button>
       {saveError && (

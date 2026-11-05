@@ -80,11 +80,11 @@ async function ResultsContent({ searchParams }: ResultsPageProps) {
   });
 
   return (
-    <div className="min-h-screen bg-white text-slate-900">
+    <div className="flex-1 text-slate-900">
       <SiteHeader />
       <main className="mx-auto max-w-3xl px-5 pb-12 pt-8 sm:px-8 sm:pt-12">
         <Link
-          className="inline-flex min-h-11 items-center gap-2 text-sm font-medium text-blue-700 hover:text-blue-900 focus-visible:outline-2 focus-visible:outline-blue-700"
+          className="inline-flex min-h-11 items-center gap-2 text-sm font-medium text-orange-700 hover:text-orange-900 focus-visible:outline-2 focus-visible:outline-orange-500"
           href={editHref}
         >
           <ArrowLeft aria-hidden="true" className="size-4" />
@@ -92,7 +92,7 @@ async function ResultsContent({ searchParams }: ResultsPageProps) {
         </Link>
 
         <div className="mb-8 mt-6">
-          <p className="text-sm font-medium text-blue-700">
+          <p className="text-sm font-medium text-orange-700">
             {search.totalResults === 0
               ? "A few ideas to try"
               : `${search.totalResults} ${search.totalResults === 1 ? "match" : "matches"}`}
@@ -164,21 +164,21 @@ async function ResultsContent({ searchParams }: ResultsPageProps) {
               </p>
               <div className="mt-4 flex flex-wrap gap-3">
                 <Link
-                  className="inline-flex min-h-11 items-center justify-center rounded-lg bg-blue-700 px-4 text-sm font-semibold text-white hover:bg-blue-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700"
+                  className="bg-brand inline-flex min-h-11 items-center justify-center rounded-full px-5 text-sm font-semibold text-white shadow-md shadow-orange-200/70 hover:brightness-105 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-500"
                   href={widerSearchHref}
                 >
                   Try {widenedDistance} miles
                 </Link>
                 {filters.timeOfDay !== "anytime" && (
                   <Link
-                    className="inline-flex min-h-11 items-center justify-center rounded-lg border border-slate-300 px-4 text-sm font-semibold text-slate-700 hover:border-blue-300 hover:bg-blue-50 hover:text-blue-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700"
+                    className="inline-flex min-h-11 items-center justify-center rounded-full border border-slate-300 px-5 text-sm font-semibold text-slate-700 hover:border-orange-300 hover:bg-orange-50 hover:text-orange-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-500"
                     href={anyTimeSearchHref}
                   >
                     Try any time
                   </Link>
                 )}
                 <Link
-                  className="inline-flex min-h-11 items-center justify-center px-3 text-sm font-semibold text-blue-700 underline underline-offset-4 hover:text-blue-900 focus-visible:outline-2 focus-visible:outline-blue-700"
+                  className="inline-flex min-h-11 items-center justify-center px-3 text-sm font-semibold text-orange-700 underline underline-offset-4 hover:text-orange-900 focus-visible:outline-2 focus-visible:outline-orange-500"
                   href={editHref}
                 >
                   Change answers

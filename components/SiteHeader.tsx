@@ -1,28 +1,27 @@
-import { Eye } from "lucide-react";
+import { Map } from "lucide-react";
 import Link from "next/link";
 
 export function SiteHeader() {
   return (
-    <header className="border-b border-slate-200 bg-white">
+    <header className="border-b border-orange-100/80 bg-white/70 backdrop-blur">
       <nav
         aria-label="Main navigation"
-        className="mx-auto flex h-16 max-w-6xl items-center justify-between px-5 sm:px-8"
+        className="mx-auto flex h-16 max-w-6xl items-center px-5 sm:px-8"
       >
         <Link
-          aria-label="Local Eye home"
-          className="inline-flex items-center gap-2 text-slate-900"
+          aria-label="Little Plans Around Here home"
+          className="inline-flex min-h-11 items-center gap-2 rounded-lg text-slate-900 hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-500"
           href="/"
         >
-          <Eye aria-hidden="true" className="size-5 text-blue-700" />
-          <span className="text-base font-semibold tracking-tight">
-            Local Eye
+          <span
+            aria-hidden="true"
+            className="bg-brand inline-flex size-7 items-center justify-center rounded-lg text-white shadow-sm shadow-orange-200"
+          >
+            <Map className="size-4" strokeWidth={2.25} />
           </span>
-        </Link>
-        <Link
-          className="inline-flex min-h-11 items-center rounded-lg px-3 text-sm font-medium text-slate-600 hover:bg-blue-50 hover:text-blue-800 focus-visible:outline-2 focus-visible:outline-blue-700"
-          href="/saved"
-        >
-          Saved
+          <span className="text-brand text-base font-bold tracking-tight">
+            Little Plans Around Here
+          </span>
         </Link>
       </nav>
     </header>

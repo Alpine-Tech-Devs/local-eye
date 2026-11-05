@@ -20,7 +20,7 @@ export default async function OpenGraphImage({
       style={{
         alignItems: "flex-start",
         background:
-          "linear-gradient(135deg, #eff6ff 0%, #ffffff 55%, #dbeafe 100%)",
+          "linear-gradient(135deg, #ffedd5 0%, #ffffff 55%, #fef3c7 100%)",
         color: "#0f172a",
         display: "flex",
         flexDirection: "column",
@@ -30,8 +30,8 @@ export default async function OpenGraphImage({
         width: "100%",
       }}
     >
-      <div style={{ color: "#1d4ed8", fontSize: 28, fontWeight: 700 }}>
-        LOCAL EYE · {event?.category ?? "LOCAL EVENT"}
+      <div style={{ color: "#ea580c", fontSize: 28, fontWeight: 700 }}>
+        LITTLE PLANS AROUND HERE · {event?.category ?? "LOCAL EVENT"}
       </div>
       <div
         style={{

@@ -1,4 +1,4 @@
-const ANONYMOUS_ID_KEY = "local-eye:anonymous-id";
+const ANONYMOUS_ID_KEY = "little-plans:anonymous-id";
 
 export function getAnonymousId(): string {
   const storedId = window.localStorage.getItem(ANONYMOUS_ID_KEY);

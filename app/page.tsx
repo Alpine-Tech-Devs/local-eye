@@ -30,14 +30,18 @@ function HomeLoading() {
   return (
     <main className="mx-auto max-w-3xl px-5 pb-10 pt-12 sm:px-8 sm:pt-20">
       <section className="max-w-2xl" aria-busy="true">
-        <h1 className="text-3xl font-semibold leading-tight tracking-tight text-slate-950 sm:text-4xl">
-          Looking for something to do in Seacoast, Maine &amp; New Hampshire?
+        <p className="text-brand text-sm font-bold uppercase tracking-wide">
+          Seacoast Maine &amp; New Hampshire
+        </p>
+        <h1 className="mt-3 text-4xl font-bold leading-tight tracking-tight text-slate-950 sm:text-5xl">
+          Big fun, close to home.
         </h1>
         <p className="mt-4 text-base leading-7 text-slate-600 sm:text-lg">
-          Answer 3 questions and get local suggestions.
+          Find family-friendly things to do around here. Answer 3 quick
+          questions and we&apos;ll do the rest.
         </p>
         <Button className="mt-8" disabled type="button">
-          Start
+          Let&apos;s go
         </Button>
       </section>
     </main>
