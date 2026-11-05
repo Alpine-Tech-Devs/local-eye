@@ -6,11 +6,13 @@ import {
   Ticket,
   Trees,
 } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 
 import type { Event } from "@/lib/events/types";
 import { EVENT_TIME_ZONE } from "@/lib/events/time";
 import { TrackedAnchor, TrackedLink } from "@/components/analytics/TrackedLink";
+import { getTrustedEventImageUrl } from "./trusted-image-url";
 import { SaveButton } from "./SaveButton";
 
 const CATEGORY_STYLES: Record<string, string> = {
@@ -94,14 +96,23 @@ export function EventCard({
         : MapPin;
   const categoryStyle =
     CATEGORY_STYLES[event.category] ?? CATEGORY_STYLES.Other;
+  const imageUrl = getTrustedEventImageUrl(event.imageUrl);
 
   return (
     <article className="overflow-hidden rounded-xl border border-slate-200 bg-white">
       <div
-        aria-hidden="true"
-        className={`flex h-20 items-end px-5 pb-3 sm:px-6 ${categoryStyle}`}
+        className={`relative flex h-28 items-end px-5 pb-3 sm:px-6 ${categoryStyle}`}
       >
-        <span className="rounded-full bg-white/80 px-3 py-1 text-xs font-semibold backdrop-blur">
+        {imageUrl && (
+          <Image
+            alt=""
+            className="object-cover"
+            fill
+            sizes="(max-width: 640px) 100vw, 600px"
+            src={imageUrl}
+          />
+        )}
+        <span className="relative z-10 rounded-full bg-white/90 px-3 py-1 text-xs font-semibold backdrop-blur">
           {event.category}
         </span>
       </div>

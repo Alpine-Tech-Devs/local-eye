@@ -1,17 +1,17 @@
+import { forwardRef } from "react";
 import type { ButtonHTMLAttributes } from "react";
 
 type ChipProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   selected: boolean;
 };
 
-export function Chip({
-  className = "",
-  selected,
-  ...props
-}: ChipProps) {
+export const Chip = forwardRef<HTMLButtonElement, ChipProps>(function Chip(
+  { className = "", selected, ...props },
+  ref,
+) {
   return (
     <button
-      aria-pressed={selected}
+      ref={ref}
       className={`min-h-11 rounded-lg border px-4 py-2 text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700 ${
         selected
           ? "border-blue-700 bg-blue-700 text-white"
@@ -20,4 +20,6 @@ export function Chip({
       {...props}
     />
   );
-}
+});
+
+Chip.displayName = "Chip";

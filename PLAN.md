@@ -204,12 +204,14 @@ Existing starting point: `seacoast-events/` is a fresh Next.js 16 + React 19 + T
 
 ## Phase 9 — Polish, Quality & Launch
 
+**Status:** Steps 1–6 complete; deployment and legal/trust work (steps 7–8) remain.
+
 1. **Accessibility:** labels on all controls, focus states, keyboard navigation for segmented controls, color contrast.
 2. **Performance:** `next/image` with remote patterns for source image domains; results page cached briefly (`revalidate` ~5 min) keyed by params.
 3. **SEO basics:** metadata, OG image, `robots.txt`, `sitemap` for event detail pages.
 4. **Error handling:** `error.tsx` and `not-found.tsx` for results and event routes.
 5. **Tests:** vitest for lib; one Playwright smoke test for home → results → detail.
-6. **CI:** GitHub Action for lint + typecheck + tests on PR.
+6. **CI:** GitHub Action for lint + typecheck + tests on PR. **Complete:** `.github/workflows/ci.yml` runs all three checks on pull requests.
 7. **Deploy:** Vercel project, env vars, Supabase production project, custom domain. Preview deploys per PR.
 8. **Legal/trust:** footer with "Events are sourced from organizers — always confirm details at the original source" + simple privacy note (anonymous analytics only).
 

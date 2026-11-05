@@ -191,7 +191,11 @@ export function SearchForm({ initialFilters, hasUrlFilters }: SearchFormProps) {
         ) : (
           <>
             <div className="mb-9">
-              <p className="text-sm font-medium text-blue-700">
+              <p
+                aria-atomic="true"
+                aria-live="polite"
+                className="text-sm font-medium text-blue-700"
+              >
                 Question {step} of 3
               </p>
               <div

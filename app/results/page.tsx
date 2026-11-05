@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 
@@ -10,6 +11,7 @@ import {
 import { searchEvents } from "@/lib/events/query";
 import { EVENT_TIME_ZONE } from "@/lib/events/time";
 import { getTownBySlug } from "@/lib/geo/towns";
+import ResultsLoading from "./loading";
 
 interface ResultsPageProps {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
@@ -56,7 +58,7 @@ function makeSearchHref(
   return `/results?${filtersToSearchParams(filters).toString()}`;
 }
 
-export default async function ResultsPage({ searchParams }: ResultsPageProps) {
+async function ResultsContent({ searchParams }: ResultsPageProps) {
   const params = await searchParams;
   const filters = parseFiltersFromSearchParams(params);
   const search = await searchEvents(filters, { limit: 3 });
@@ -187,5 +189,13 @@ export default async function ResultsPage({ searchParams }: ResultsPageProps) {
         </div>
       </main>
     </div>
+  );
+}
+
+export default function ResultsPage({ searchParams }: ResultsPageProps) {
+  return (
+    <Suspense fallback={<ResultsLoading />}>
+      <ResultsContent searchParams={searchParams} />
+    </Suspense>
   );
 }

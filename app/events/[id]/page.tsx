@@ -61,16 +61,18 @@ export async function generateMetadata({
   if (!event) return { title: "Event not found | Local Eye" };
 
   return {
-    title: `${event.title} | Local Eye`,
+    title: event.title,
     description:
       event.description ??
       `${event.title} at ${event.venueName} in ${event.city}, ${event.state}.`,
     openGraph: {
-      title: `${event.title} | Local Eye`,
+      title: event.title,
       description:
         event.description ??
         `${event.title} at ${event.venueName} in ${event.city}, ${event.state}.`,
+      images: [`/events/${event.id}/opengraph-image`],
     },
+    twitter: { card: "summary_large_image" },
   };
 }
 

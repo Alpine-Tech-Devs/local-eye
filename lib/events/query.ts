@@ -1,5 +1,6 @@
 import type { SearchFilters } from "./filters";
 import { SearchFiltersSchema } from "./filters";
+import { getCachedEventRows } from "./cached-query";
 import {
   getRelaxedSearchFilters,
   matchesEventFilters,
@@ -8,7 +9,6 @@ import {
 } from "./rank";
 import { resolveDateRange } from "./time";
 import type { Event } from "./types";
-import { createSupabaseServerClient } from "../supabase/server";
 import { mapRowToEvent } from "../supabase/map-row-to-event";
 
 const DEFAULT_RESULT_LIMIT = 8;
@@ -34,55 +34,6 @@ function validateLimit(limit: number): number {
     throw new Error("Search result limit must be a positive integer.");
   }
   return limit;
-}
-
-function getCoarseFilterAlternatives(
-  filters: SearchFilters,
-): string[][] {
-  const groups: string[][] = [];
-  if (filters.childAge !== undefined) {
-    const age = filters.childAge;
-    groups.push([
-      "min_age.is.null,max_age.is.null",
-      `min_age.is.null,max_age.gte.${age}`,
-      `min_age.lte.${age},max_age.is.null`,
-      `min_age.lte.${age},max_age.gte.${age}`,
-    ]);
-  }
-
-  if (filters.environment === "indoor" || filters.environment === "outdoor") {
-    groups.push([
-      `indoor_outdoor.eq.${filters.environment}`,
-      "indoor_outdoor.eq.either",
-    ]);
-  }
-
-  switch (filters.budget) {
-    case "free":
-      groups.push(["is_free.eq.true"]);
-      break;
-    case "under10":
-      groups.push(["is_free.eq.true", "price_max.lte.10"]);
-      break;
-    case "under20":
-      groups.push(["is_free.eq.true", "price_max.lte.20"]);
-      break;
-  }
-
-  return groups;
-}
-
-function combineAlternatives(groups: string[][]): string {
-  let combinations = [""];
-  for (const alternatives of groups) {
-    combinations = combinations.flatMap((combination) =>
-      alternatives.map((alternative) =>
-        [combination, alternative].filter(Boolean).join(","),
-      ),
-    );
-  }
-
-  return combinations.map((combination) => `and(${combination})`).join(",");
 }
 
 function getEffectiveDateStart(filters: SearchFilters, now: Date): Date {
@@ -111,25 +62,12 @@ export async function searchEvents(
     };
   }
 
-  const supabase = await createSupabaseServerClient();
-  let query = supabase
-    .from("events")
-    .select("*")
-    .eq("status", "published")
-    .gte("start_datetime", getEffectiveDateStart(filters, now).toISOString())
-    .lt("start_datetime", dateRange.end.toISOString());
-
-  const coarseFilterGroups = getCoarseFilterAlternatives(filters);
-  if (coarseFilterGroups.length > 0) {
-    query = query.or(combineAlternatives(coarseFilterGroups));
-  }
-
-  const { data, error } = await query;
-  if (error) {
-    throw new Error("Unable to search Supabase events.", { cause: error });
-  }
-
-  const events: Event[] = data.map(mapRowToEvent);
+  const rows = await getCachedEventRows(
+    filters,
+    dateRange.start.toISOString(),
+    dateRange.end.toISOString(),
+  );
+  const events: Event[] = rows.map(mapRowToEvent);
   const matchingEvents = events.filter((event) =>
     matchesEventFilters(event, filters, now),
   );
@@ -145,8 +83,7 @@ export async function searchEvents(
     relaxedSuggestions = rankEvents(
       events.filter(
         (event) =>
-          !exactIds.has(event.id) &&
-          matchesEventFilters(event, relaxed, now),
+          !exactIds.has(event.id) && matchesEventFilters(event, relaxed, now),
       ),
       relaxed,
       now,

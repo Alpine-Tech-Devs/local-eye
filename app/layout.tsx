@@ -1,10 +1,28 @@
 import type { Metadata, Viewport } from "next";
 import { SessionStartTracker } from "@/components/analytics/SessionStartTracker";
+import { getSiteUrl } from "@/lib/seo/site-url";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Local Eye",
-  description: "Discover kid-friendly events and activities near you.",
+  metadataBase: getSiteUrl(),
+  title: {
+    default: "Local Eye",
+    template: "%s | Local Eye",
+  },
+  description:
+    "Find family-friendly events and activities in Seacoast Maine and New Hampshire.",
+  openGraph: {
+    type: "website",
+    siteName: "Local Eye",
+    title: "Local Eye",
+    description:
+      "Find family-friendly events and activities in Seacoast Maine and New Hampshire.",
+    images: ["/opengraph-image"],
+  },
+  twitter: {
+    card: "summary_large_image",
+    images: ["/opengraph-image"],
+  },
 };
 
 export const viewport: Viewport = {
