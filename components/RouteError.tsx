@@ -18,8 +18,8 @@ export function RouteError({ error, retry, title, message }: RouteErrorProps) {
   }, [error]);
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-2xl flex-col justify-center px-5 py-12 text-slate-900 sm:px-8">
-      <p className="text-sm font-semibold text-blue-700">Local Eye</p>
+    <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col justify-center px-5 py-12 text-slate-900 sm:px-8">
+      <p className="text-brand text-sm font-bold">Little Plans Around Here</p>
       <h1 className="mt-3 text-2xl font-semibold tracking-tight text-slate-950 sm:text-3xl">
         {title}
       </h1>
@@ -29,7 +29,7 @@ export function RouteError({ error, retry, title, message }: RouteErrorProps) {
           Try again
         </Button>
         <Link
-          className="inline-flex min-h-11 items-center rounded-xl border border-slate-300 px-5 text-sm font-semibold text-slate-800 hover:bg-blue-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700"
+          className="inline-flex min-h-11 items-center rounded-full border border-slate-300 px-5 text-sm font-semibold text-slate-800 hover:border-orange-300 hover:bg-orange-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-500"
           href="/"
         >
           Back to search

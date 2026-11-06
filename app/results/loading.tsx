@@ -5,14 +5,14 @@ export default function ResultsLoading() {
     <div
       aria-label="Loading local suggestions"
       aria-live="polite"
-      className="min-h-screen bg-white"
+      className="flex-1"
       role="status"
     >
       <SiteHeader />
       <main className="mx-auto max-w-3xl px-5 pb-12 pt-8 sm:px-8 sm:pt-12">
         <div className="h-11 w-36 animate-pulse rounded-lg bg-slate-100" />
         <div className="mb-8 mt-6 space-y-3">
-          <div className="h-4 w-24 animate-pulse rounded bg-blue-100" />
+          <div className="h-4 w-24 animate-pulse rounded bg-orange-100" />
           <div className="h-9 w-64 max-w-full animate-pulse rounded bg-slate-100" />
           <div className="h-4 w-80 max-w-full animate-pulse rounded bg-slate-100" />
         </div>

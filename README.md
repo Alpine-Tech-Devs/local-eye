@@ -1,6 +1,6 @@
-# Local Eye
+# Little Plans Around Here
 
-Local Eye helps families discover kid-friendly events and activities nearby.
+Big fun, close to home. Little Plans Around Here helps families find family-friendly things to do around here.
 
 ## Setup
 

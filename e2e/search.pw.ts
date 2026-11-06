@@ -78,7 +78,7 @@ test.beforeAll(async () => {
       category: "Storytime",
       is_free: true,
       indoor_outdoor: "indoor",
-      source_name: "Local Eye test",
+      source_name: "Little Plans test",
       source_url: "https://example.com/test-event",
       status: "published",
     })
@@ -105,7 +105,7 @@ test.afterAll(async () => {
 
 test("searches for an event and opens its details", async ({ page }) => {
   await page.goto("/");
-  await page.getByRole("button", { name: "Start" }).click();
+  await page.getByRole("button", { name: "Let's go" }).click();
   await page.getByRole("button", { name: "Next", exact: true }).click();
 
   const todayRadio = page.getByRole("radio", { name: "Today" });

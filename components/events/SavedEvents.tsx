@@ -1,5 +1,7 @@
 "use client";
 
+import { Heart } from "lucide-react";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 
 import { EventCard } from "@/components/events/EventCard";
@@ -109,11 +111,26 @@ export function SavedEvents() {
 
   if (events.length === 0) {
     return (
-      <section className="rounded-xl border border-slate-200 bg-slate-50 p-6">
-        <h2 className="font-semibold text-slate-900">No saved events yet</h2>
-        <p className="mt-2 text-sm leading-6 text-slate-600">
-          Tap the heart on an event to keep it here for later.
+      <section className="rounded-2xl border border-dashed border-orange-200 bg-white/60 p-8 text-center">
+        <span
+          aria-hidden="true"
+          className="mx-auto inline-flex size-12 items-center justify-center rounded-full bg-orange-50 text-orange-500"
+        >
+          <Heart className="size-6" />
+        </span>
+        <h2 className="mt-4 font-semibold text-slate-900">
+          Nothing saved yet
+        </h2>
+        <p className="mx-auto mt-2 max-w-sm text-sm leading-6 text-slate-600">
+          Tap the heart on any event to keep it here. Saved events stay on
+          this device — no account needed.
         </p>
+        <Link
+          className="bg-brand mt-6 inline-flex min-h-11 items-center justify-center rounded-full px-6 text-sm font-semibold text-white shadow-md shadow-orange-200/70 hover:brightness-105 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-500"
+          href="/"
+        >
+          Find something to do
+        </Link>
       </section>
     );
   }

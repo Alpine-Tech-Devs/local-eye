@@ -4,7 +4,7 @@ import { useEffect } from "react";
 
 import { trackAnalyticsEvent } from "@/lib/analytics/track";
 
-const SESSION_STARTED_KEY = "local-eye:analytics-session-started";
+const SESSION_STARTED_KEY = "little-plans:analytics-session-started";
 
 export function SessionStartTracker() {
   useEffect(() => {

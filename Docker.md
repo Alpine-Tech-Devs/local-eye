@@ -1,6 +1,6 @@
 # Docker and Local Supabase Setup
 
-This guide covers running the Local Eye Supabase stack on macOS with Docker
+This guide covers running the Little Plans Around Here Supabase stack on macOS with Docker
 Desktop. The local stack is separate from the linked Supabase cloud project.
 
 ## 1. Start Docker Desktop

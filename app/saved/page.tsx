@@ -6,11 +6,11 @@ import { SiteHeader } from "@/components/SiteHeader";
 
 export default function SavedPage() {
   return (
-    <div className="min-h-screen bg-white text-slate-900">
+    <div className="flex-1 text-slate-900">
       <SiteHeader />
       <main className="mx-auto max-w-3xl px-5 pb-12 pt-8 sm:px-8 sm:pt-12">
         <Link
-          className="inline-flex min-h-11 items-center gap-2 text-sm font-medium text-blue-700 hover:text-blue-900 focus-visible:outline-2 focus-visible:outline-blue-700"
+          className="inline-flex min-h-11 items-center gap-2 text-sm font-medium text-orange-700 hover:text-orange-900 focus-visible:outline-2 focus-visible:outline-orange-500"
           href="/"
         >
           <ArrowLeft aria-hidden="true" className="size-4" />
@@ -21,7 +21,7 @@ export default function SavedPage() {
             Saved events
           </h1>
           <p className="mt-2 text-sm leading-6 text-slate-600">
-            Events you save on this device will appear here.
+            Events you heart are kept here on this device.
           </p>
         </div>
         <SavedEvents />

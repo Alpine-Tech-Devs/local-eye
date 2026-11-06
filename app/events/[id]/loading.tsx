@@ -2,7 +2,7 @@ import { SiteHeader } from "@/components/SiteHeader";
 
 export default function EventLoading() {
   return (
-    <div className="min-h-screen bg-white">
+    <div className="flex-1">
       <SiteHeader />
       <main
         aria-label="Loading event details"

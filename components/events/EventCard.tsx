@@ -121,7 +121,7 @@ export function EventCard({
           <div className="min-w-0">
             {flexible && (
               <p className="mb-3">
-                <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-800">
+                <span className="rounded-full bg-orange-50 px-3 py-1 text-xs font-semibold text-orange-800">
                   Flexible suggestion
                 </span>
               </p>
@@ -129,7 +129,7 @@ export function EventCard({
             <h2 className="text-lg font-semibold leading-snug text-slate-950">
               {resultPosition ? (
                 <TrackedLink
-                  className="rounded-sm hover:text-blue-800 focus-visible:outline-2 focus-visible:outline-blue-700"
+                  className="rounded-sm hover:text-orange-700 focus-visible:outline-2 focus-visible:outline-orange-500"
                   eventType="result_click"
                   href={`/events/${event.id}`}
                   payload={{ eventId: event.id, position: resultPosition }}
@@ -138,7 +138,7 @@ export function EventCard({
                 </TrackedLink>
               ) : (
                 <Link
-                  className="rounded-sm hover:text-blue-800 focus-visible:outline-2 focus-visible:outline-blue-700"
+                  className="rounded-sm hover:text-orange-700 focus-visible:outline-2 focus-visible:outline-orange-500"
                   href={`/events/${event.id}`}
                 >
                   {event.title}
@@ -156,7 +156,7 @@ export function EventCard({
           <p className="flex items-center gap-2">
             <CalendarDays
               aria-hidden="true"
-              className="size-4 shrink-0 text-blue-700"
+              className="size-4 shrink-0 text-orange-500"
             />
             {formatEventDate(event.startDateTime, event.endDateTime)}
           </p>
@@ -164,7 +164,7 @@ export function EventCard({
             <p className="flex items-center gap-2">
               <MapPin
                 aria-hidden="true"
-                className="size-4 shrink-0 text-blue-700"
+                className="size-4 shrink-0 text-orange-500"
               />
               {distanceMiles.toFixed(1)} mi away
             </p>
@@ -172,7 +172,7 @@ export function EventCard({
           <p className="flex items-center gap-2">
             <Ticket
               aria-hidden="true"
-              className="size-4 shrink-0 text-blue-700"
+              className="size-4 shrink-0 text-orange-500"
             />
             <span
               className={event.isFree ? "font-semibold text-emerald-800" : ""}
@@ -183,7 +183,7 @@ export function EventCard({
           <p className="flex items-center gap-2">
             <SettingIcon
               aria-hidden="true"
-              className="size-4 shrink-0 text-blue-700"
+              className="size-4 shrink-0 text-orange-500"
             />
             <span className="capitalize">{event.indoorOutdoor}</span>
           </p>
@@ -209,7 +209,7 @@ export function EventCard({
         <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2 border-t border-slate-100 pt-3">
           {resultPosition ? (
             <TrackedLink
-              className="inline-flex min-h-11 items-center text-sm font-semibold text-blue-700 underline decoration-blue-200 underline-offset-4 hover:text-blue-900 focus-visible:outline-2 focus-visible:outline-blue-700"
+              className="inline-flex min-h-11 items-center text-sm font-semibold text-orange-700 underline decoration-orange-200 underline-offset-4 hover:text-orange-900 focus-visible:outline-2 focus-visible:outline-orange-500"
               eventType="result_click"
               href={`/events/${event.id}`}
               payload={{ eventId: event.id, position: resultPosition }}
@@ -218,14 +218,14 @@ export function EventCard({
             </TrackedLink>
           ) : (
             <Link
-              className="inline-flex min-h-11 items-center text-sm font-semibold text-blue-700 underline decoration-blue-200 underline-offset-4 hover:text-blue-900 focus-visible:outline-2 focus-visible:outline-blue-700"
+              className="inline-flex min-h-11 items-center text-sm font-semibold text-orange-700 underline decoration-orange-200 underline-offset-4 hover:text-orange-900 focus-visible:outline-2 focus-visible:outline-orange-500"
               href={`/events/${event.id}`}
             >
               Event details
             </Link>
           )}
           <TrackedAnchor
-            className="inline-flex min-h-11 items-center gap-2 text-sm font-medium text-slate-600 hover:text-blue-800 focus-visible:outline-2 focus-visible:outline-blue-700"
+            className="inline-flex min-h-11 items-center gap-2 text-sm font-medium text-slate-600 hover:text-orange-700 focus-visible:outline-2 focus-visible:outline-orange-500"
             href={event.sourceUrl}
             rel="noreferrer"
             target="_blank"

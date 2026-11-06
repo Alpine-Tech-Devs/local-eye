@@ -58,7 +58,7 @@ export async function generateMetadata({
   const { id } = await params;
   const event = await getPublishedEvent(id);
 
-  if (!event) return { title: "Event not found | Local Eye" };
+  if (!event) return { title: "Event not found | Little Plans Around Here" };
 
   return {
     title: event.title,
@@ -87,26 +87,23 @@ export default async function EventPage({ params }: EventPageProps) {
   const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mapQuery)}`;
 
   return (
-    <div className="min-h-screen bg-white text-slate-900">
+    <div className="flex-1 text-slate-900">
       <SiteHeader />
       <main className="mx-auto max-w-3xl px-5 pb-12 pt-8 sm:px-8 sm:pt-12">
         <Link
-          className="inline-flex min-h-11 items-center gap-2 text-sm font-medium text-blue-700 hover:text-blue-900 focus-visible:outline-2 focus-visible:outline-blue-700"
+          className="inline-flex min-h-11 items-center gap-2 text-sm font-medium text-orange-700 hover:text-orange-900 focus-visible:outline-2 focus-visible:outline-orange-500"
           href="/"
         >
           <ArrowLeft aria-hidden="true" className="size-4" />
           Back to search
         </Link>
 
-        <article className="mt-5 overflow-hidden rounded-2xl border border-slate-200 bg-white">
-          <div
-            aria-hidden="true"
-            className="h-2 bg-gradient-to-r from-blue-200 via-sky-300 to-blue-500"
-          />
+        <article className="mt-5 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm shadow-orange-100">
+          <div aria-hidden="true" className="bg-brand h-2" />
           <div className="p-5 sm:p-8">
             <div className="flex items-start justify-between gap-4">
               <div>
-                <p className="text-sm font-semibold text-blue-700">
+                <p className="text-sm font-semibold text-orange-700">
                   {event.category}
                 </p>
                 <h1 className="mt-2 text-2xl font-semibold tracking-tight text-slate-950 sm:text-3xl">
@@ -124,7 +121,7 @@ export default async function EventPage({ params }: EventPageProps) {
                 <dt className="flex items-center gap-2 text-sm font-medium text-slate-600">
                   <CalendarDays
                     aria-hidden="true"
-                    className="size-4 text-blue-700"
+                    className="size-4 text-orange-500"
                   />
                   When
                 </dt>
@@ -134,7 +131,7 @@ export default async function EventPage({ params }: EventPageProps) {
               </div>
               <div>
                 <dt className="flex items-center gap-2 text-sm font-medium text-slate-600">
-                  <Ticket aria-hidden="true" className="size-4 text-blue-700" />
+                  <Ticket aria-hidden="true" className="size-4 text-orange-500" />
                   Price
                 </dt>
                 <dd className="mt-2 text-sm text-slate-900">
@@ -189,7 +186,7 @@ export default async function EventPage({ params }: EventPageProps) {
               <p className="mt-2 flex items-start gap-2 text-sm leading-6 text-slate-700">
                 <MapPin
                   aria-hidden="true"
-                  className="mt-1 size-4 shrink-0 text-blue-700"
+                  className="mt-1 size-4 shrink-0 text-orange-500"
                 />
                 <span>
                   {event.venueName}
@@ -204,7 +201,7 @@ export default async function EventPage({ params }: EventPageProps) {
                 </span>
               </p>
               <a
-                className="mt-3 inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-blue-700 underline decoration-blue-200 underline-offset-4 hover:text-blue-900 focus-visible:outline-2 focus-visible:outline-blue-700"
+                className="mt-3 inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-orange-700 underline decoration-orange-200 underline-offset-4 hover:text-orange-900 focus-visible:outline-2 focus-visible:outline-orange-500"
                 href={mapUrl}
                 rel="noreferrer"
                 target="_blank"
@@ -217,7 +214,7 @@ export default async function EventPage({ params }: EventPageProps) {
             <section className="mt-7 flex flex-wrap gap-3">
               {event.registrationUrl ? (
                 <TrackedAnchor
-                  className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-blue-700 px-5 text-sm font-semibold text-white hover:bg-blue-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700"
+                  className="bg-brand inline-flex min-h-11 items-center justify-center gap-2 rounded-full px-5 text-sm font-semibold text-white shadow-md shadow-orange-200/70 hover:brightness-105 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-500"
                   href={event.registrationUrl}
                   rel="noreferrer"
                   target="_blank"
@@ -236,7 +233,7 @@ export default async function EventPage({ params }: EventPageProps) {
                 </p>
               ) : null}
               <TrackedAnchor
-                className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg border border-slate-300 px-5 text-sm font-semibold text-slate-700 hover:border-blue-300 hover:bg-blue-50 hover:text-blue-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700"
+                className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-slate-300 px-5 text-sm font-semibold text-slate-700 hover:border-orange-300 hover:bg-orange-50 hover:text-orange-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-500"
                 href={event.sourceUrl}
                 rel="noreferrer"
                 target="_blank"

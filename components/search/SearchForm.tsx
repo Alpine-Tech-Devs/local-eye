@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft, ArrowRight, Eye, MapPin, Search } from "lucide-react";
+import { ArrowLeft, ArrowRight, Map, MapPin, Search } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useTransition } from "react";
@@ -8,6 +8,7 @@ import type { FormEvent } from "react";
 
 import { Button } from "@/components/ui/Button";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
+import { SavedLink } from "@/components/SavedLink";
 import { trackAnalyticsEvent } from "@/lib/analytics/track";
 import { TOWNS } from "@/lib/geo/towns";
 import {
@@ -22,7 +23,7 @@ import {
   type TimeOfDay,
 } from "@/lib/events/filters";
 
-const STORAGE_KEY = "local-eye:search-filters";
+const STORAGE_KEY = "little-plans:search-filters";
 const DATE_OPTIONS = [
   { value: "today", label: "Today" },
   { value: "tomorrow", label: "Tomorrow" },
@@ -113,6 +114,12 @@ export function SearchForm({ initialFilters, hasUrlFilters }: SearchFormProps) {
     setStep((current) => Math.min(current + 1, 3));
   }
 
+  function goHome() {
+    setValidationMessage("");
+    setStep(0);
+    window.scrollTo({ top: 0 });
+  }
+
   function submitSearch(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const parsed = SearchFiltersSchema.safeParse(filters);
@@ -144,47 +151,47 @@ export function SearchForm({ initialFilters, hasUrlFilters }: SearchFormProps) {
   }
 
   return (
-    <div className="min-h-screen bg-white text-slate-900">
-      <header className="border-b border-slate-200 bg-white">
+    <div className="flex-1 text-slate-900">
+      <header className="border-b border-orange-100/80 bg-white/70 backdrop-blur">
         <nav
           aria-label="Main navigation"
           className="mx-auto flex h-16 max-w-6xl items-center justify-between px-5 sm:px-8"
         >
           <Link
-            aria-label="Local Eye home"
-            className="inline-flex items-center gap-2 text-slate-900"
+            aria-label="Little Plans Around Here home"
+            className="inline-flex min-h-11 items-center gap-2 rounded-lg text-slate-900 hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-500"
             href="/"
+            onClick={goHome}
           >
-            <Eye
+            <span
               aria-hidden="true"
-              className="size-5 text-blue-700"
-              strokeWidth={2.25}
-            />
-            <span className="text-base font-semibold tracking-tight">
-              Local Eye
+              className="bg-brand inline-flex size-7 items-center justify-center rounded-lg text-white shadow-sm shadow-orange-200"
+            >
+              <Map className="size-4" strokeWidth={2.25} />
+            </span>
+            <span className="text-brand text-base font-bold tracking-tight">
+              Little Plans Around Here
             </span>
           </Link>
-          <Link
-            className="inline-flex min-h-11 items-center rounded-lg px-3 text-sm font-medium text-slate-600 hover:bg-blue-50 hover:text-blue-800 focus-visible:outline-2 focus-visible:outline-blue-700"
-            href="/saved"
-          >
-            Saved
-          </Link>
+          <SavedLink />
         </nav>
       </header>
 
       <main className="mx-auto max-w-3xl px-5 pb-10 pt-12 sm:px-8 sm:pt-20">
         {step === 0 ? (
           <section className="max-w-2xl">
-            <h1 className="text-3xl font-semibold leading-tight tracking-tight text-slate-950 sm:text-4xl">
-              Looking for something to do in Seacoast, Maine &amp; New
-              Hampshire?
+            <p className="text-brand text-sm font-bold uppercase tracking-wide">
+              Seacoast Maine &amp; New Hampshire
+            </p>
+            <h1 className="mt-3 text-4xl font-bold leading-tight tracking-tight text-slate-950 sm:text-5xl">
+              Big fun, close to home.
             </h1>
             <p className="mt-4 text-base leading-7 text-slate-600 sm:text-lg">
-              Answer 3 questions and get local suggestions.
+              Find family-friendly things to do around here. Answer 3 quick
+              questions and we&apos;ll do the rest.
             </p>
             <Button className="mt-8" onClick={() => setStep(1)} type="button">
-              Start
+              Let&apos;s go
               <ArrowRight aria-hidden="true" className="size-4" />
             </Button>
           </section>
@@ -194,7 +201,7 @@ export function SearchForm({ initialFilters, hasUrlFilters }: SearchFormProps) {
               <p
                 aria-atomic="true"
                 aria-live="polite"
-                className="text-sm font-medium text-blue-700"
+                className="text-sm font-semibold text-orange-700"
               >
                 Question {step} of 3
               </p>
@@ -206,8 +213,8 @@ export function SearchForm({ initialFilters, hasUrlFilters }: SearchFormProps) {
                 {[1, 2, 3].map((number) => (
                   <span
                     key={number}
-                    className={`h-1.5 flex-1 rounded-full ${
-                      number <= step ? "bg-blue-700" : "bg-slate-200"
+                    className={`h-1.5 flex-1 rounded-full transition-colors ${
+                      number <= step ? "bg-brand" : "bg-orange-100"
                     }`}
                   />
                 ))}
@@ -234,7 +241,7 @@ export function SearchForm({ initialFilters, hasUrlFilters }: SearchFormProps) {
                     Child&apos;s age
                     <select
                       autoFocus
-                      className="mt-2 min-h-12 w-full rounded-lg border border-slate-300 bg-white px-3 text-base focus:border-blue-600 focus:outline-2 focus:outline-blue-600"
+                      className="mt-2 min-h-12 w-full rounded-lg border border-slate-300 bg-white px-3 text-base focus:border-orange-500 focus:outline-2 focus:outline-orange-500"
                       value={filters.childAge ?? ""}
                       onChange={(event) =>
                         updateFilters({
@@ -285,7 +292,7 @@ export function SearchForm({ initialFilters, hasUrlFilters }: SearchFormProps) {
                     <label className="mt-5 block max-w-sm text-sm font-medium text-slate-700">
                       Choose date
                       <input
-                        className="mt-2 block min-h-12 w-full rounded-lg border border-slate-300 bg-white px-3 text-base focus:border-blue-600 focus:outline-2 focus:outline-blue-600"
+                        className="mt-2 block min-h-12 w-full rounded-lg border border-slate-300 bg-white px-3 text-base focus:border-orange-500 focus:outline-2 focus:outline-orange-500"
                         type="date"
                         value={filters.date.date}
                         onChange={(event) =>
@@ -324,13 +331,13 @@ export function SearchForm({ initialFilters, hasUrlFilters }: SearchFormProps) {
                       <span className="mb-2 flex items-center gap-2">
                         <MapPin
                           aria-hidden="true"
-                          className="size-4 text-blue-700"
+                          className="size-4 text-orange-500"
                         />
                         Starting town
                       </span>
                       <select
                         autoFocus
-                        className="min-h-12 w-full rounded-lg border border-slate-300 bg-white px-3 text-base focus:border-blue-600 focus:outline-2 focus:outline-blue-600"
+                        className="min-h-12 w-full rounded-lg border border-slate-300 bg-white px-3 text-base focus:border-orange-500 focus:outline-2 focus:outline-orange-500"
                         value={
                           typeof filters.origin === "string"
                             ? filters.origin
@@ -366,7 +373,7 @@ export function SearchForm({ initialFilters, hasUrlFilters }: SearchFormProps) {
                   </div>
 
                   <details className="group mt-8">
-                    <summary className="min-h-11 w-fit cursor-pointer list-none rounded-lg py-2 text-sm font-medium text-blue-700 underline decoration-blue-300 underline-offset-4 hover:text-blue-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700 [&::-webkit-details-marker]:hidden">
+                    <summary className="min-h-11 w-fit cursor-pointer list-none rounded-lg py-2 text-sm font-medium text-orange-700 underline decoration-orange-300 underline-offset-4 hover:text-orange-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-500 [&::-webkit-details-marker]:hidden">
                       More options
                       <span className="ml-2 inline-block transition-transform group-open:rotate-180">
                         ▾
