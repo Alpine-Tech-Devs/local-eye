@@ -1,12 +1,14 @@
 import { Map } from "lucide-react";
 import Link from "next/link";
 
+import { SavedLink } from "@/components/SavedLink";
+
 export function SiteHeader() {
   return (
     <header className="border-b border-orange-100/80 bg-white/70 backdrop-blur">
       <nav
         aria-label="Main navigation"
-        className="mx-auto flex h-16 max-w-6xl items-center px-5 sm:px-8"
+        className="mx-auto flex h-16 max-w-6xl items-center justify-between px-5 sm:px-8"
       >
         <Link
           aria-label="Little Plans Around Here home"
@@ -23,6 +25,7 @@ export function SiteHeader() {
             Little Plans Around Here
           </span>
         </Link>
+        <SavedLink />
       </nav>
     </header>
   );

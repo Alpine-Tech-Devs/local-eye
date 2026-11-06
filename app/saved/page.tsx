@@ -21,7 +21,7 @@ export default function SavedPage() {
             Saved events
           </h1>
           <p className="mt-2 text-sm leading-6 text-slate-600">
-            Events you save on this device will appear here.
+            Events you heart are kept here on this device.
           </p>
         </div>
         <SavedEvents />

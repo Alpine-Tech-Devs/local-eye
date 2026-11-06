@@ -80,13 +80,18 @@ export function SaveButton({ eventId }: { eventId: string }) {
       <button
         aria-label={isSaved ? "Remove from saved events" : "Save event"}
         aria-pressed={isSaved}
-        className="inline-flex size-11 items-center justify-center rounded-full border border-slate-200 text-slate-500 transition-colors hover:border-orange-300 hover:bg-orange-50 hover:text-orange-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-500"
+        className={`inline-flex size-11 items-center justify-center rounded-full border transition-[color,background-color,border-color,transform] active:scale-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-500 ${
+          isSaved
+            ? "border-orange-200 bg-orange-50 text-orange-600 hover:border-orange-300 hover:bg-orange-100"
+            : "border-slate-200 text-slate-500 hover:border-orange-300 hover:bg-orange-50 hover:text-orange-600"
+        }`}
         onClick={toggleSaved}
+        title={isSaved ? "Saved — tap to remove" : "Save for later"}
         type="button"
       >
         <Heart
           aria-hidden="true"
-          className={`size-5 ${isSaved ? "fill-orange-500 text-orange-500" : ""}`}
+          className={`size-5 transition-transform ${isSaved ? "scale-110 fill-orange-500 text-orange-500" : ""}`}
         />
       </button>
       {saveError && (
