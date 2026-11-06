@@ -7,7 +7,7 @@ import { SiteHeader } from "@/components/SiteHeader";
 export default function SavedPage() {
   return (
     <div className="flex-1 text-slate-900">
-      <SiteHeader />
+      <SiteHeader currentPage="saved" />
       <main className="mx-auto max-w-3xl px-5 pb-12 pt-8 sm:px-8 sm:pt-12">
         <Link
           className="inline-flex min-h-11 items-center gap-2 text-sm font-medium text-orange-700 hover:text-orange-900 focus-visible:outline-2 focus-visible:outline-orange-500"
