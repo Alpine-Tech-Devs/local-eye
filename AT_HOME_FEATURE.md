@@ -78,3 +78,4 @@ This tells you whether the feature is worth the larger build below before writin
 ## Checkpoint
 
 A weekly feature can be published in under five minutes, appears on the home page and sparse results, links back to the original Instagram post with credit, and `feature_click` events show up in the analytics summary view.
+ 
