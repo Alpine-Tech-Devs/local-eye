@@ -100,6 +100,43 @@ Existing starting point: `seacoast-events/` is a fresh Next.js 16 + React 19 + T
 
 **Checkpoint:** A manual sync imports current events from each configured source, repeated syncs update rather than duplicate them, and the scheduled endpoint refreshes data without exposing privileged credentials.
 
+### Phase 3a — Library Storytimes (first dataset)
+
+**Goal:** Get real, recurring, verifiable data into the catalog quickly, using library storytimes as the first source family, and build the recurrence/upsert plumbing that automated ingestion will reuse.
+
+**Why storytimes first:** ~13 libraries across the towns in `lib/geo/towns.ts`; nearly all free and indoor; tight, well-labeled age bands; predictable weekly schedules. They exercise the age, date, and distance filters well with a small dataset.
+
+**Current state (Nov 2026):** No seed data exists. `supabase/seed/` and `scripts/` contain only `.gitkeep`, `supabase/config.toml` points at a non-existent `./seed.sql`, and events have been typed into the Supabase dashboard by hand. The schema already supports idempotent seeding via the unique `(source_id, external_id)` constraint and `last_verified_at`.
+
+**Step 1 — Curated recurring rules + seed script (1–2 days)**
+
+1. `supabase/seed/storytimes.ts` — one hand-verified record per program, not per occurrence:
+   - library name, address, city/state, lat/lng
+   - weekday, start/end time (local, `America/New_York`)
+   - age band (e.g. Baby Lapsit 0–18 mo, Toddler 18 mo–3 yr, Preschool 3–5 yr) as `minAge`/`maxAge`
+   - `registrationRequired` + `registrationUrl` where applicable
+   - `sourceName`, `sourceUrl` (the library's program page), `verifiedOn` date
+   - optional `blackoutDates` / `seasonEnd` for school-vacation weeks and session breaks
+2. `scripts/seed-storytimes.ts` — expands each rule into concrete instances for the next 6–8 weeks, validates each with the existing event Zod schema, and upserts through `createSupabaseAdminClient()` with `source_id = "manual:library-storytimes"` and `external_id = "<library-slug>:<program-slug>:<YYYY-MM-DD>"`. Sets `last_verified_at` from `verifiedOn`. Re-running updates rather than duplicates.
+3. Add `pnpm seed` to `package.json`. Document required env vars (`NEXT_PUBLIC_SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`) in README.
+4. Start with 4–5 libraries that are quick to verify (Portsmouth, Dover, Rice/Kittery, York, Exeter), then fill in the remaining towns.
+5. Housekeeping: point `[db.seed] sql_paths` in `supabase/config.toml` at a real dev fixture or remove it so local resets aren't referencing a missing file.
+
+**Step 2 — Replace manual rules with real feeds, one library at a time**
+
+1. Most Seacoast libraries use LibCal, Assabet Interactive, or Google Calendar, all of which expose iCal feeds with stable UIDs and RRULEs. Look for a "Subscribe / iCal" link on each library's events page and record it alongside the manual rule.
+2. Build the `SourceAdapter` interface and an iCal adapter (Phase 3 items 2–4). Reuse the recurrence-expansion code from Step 1.
+3. Filter to storytime-like titles initially so book clubs, tax help, and board meetings are not ingested; widen later.
+4. Each converted library gets its own `source_id` (e.g. `ical:portsmouth-public-library`); delete its manual rule once the feed is verified for two consecutive weeks.
+
+**Step 3 — Automate**
+
+1. `app/api/ingest/route.ts` behind a cron secret, scheduled daily on Vercel (Phase 3 item 6).
+2. Have the same cron re-run the Step 1 seed so manual rules keep rolling forward until every library is on a feed.
+3. Surface per-source sync status (last success, last error, row count) in a private SQL view, matching the analytics summary pattern.
+
+**Checkpoint:** `pnpm seed` populates 6–8 weeks of storytimes for all Seacoast libraries, running it twice produces no duplicates, the home → results flow returns real storytimes filtered by age and town, and at least one library is sourced from a live iCal feed.
+
 ---
 
 ## Phase 4 — Query, Filter & Rank Logic

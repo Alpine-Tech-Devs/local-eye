@@ -3,6 +3,7 @@ import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 
 import { EventCard } from "@/components/events/EventCard";
+import { AtHomeCallout } from "@/components/AtHomeCallout";
 import { SiteHeader } from "@/components/SiteHeader";
 import {
   filtersToSearchParams,
@@ -187,6 +188,8 @@ async function ResultsContent({ searchParams }: ResultsPageProps) {
             </section>
           )}
         </div>
+
+        <AtHomeCallout className="mt-10" />
       </main>
     </div>
   );
