@@ -3,7 +3,11 @@ import Link from "next/link";
 
 import { SavedLink } from "@/components/SavedLink";
 
-export function SiteHeader() {
+interface SiteHeaderProps {
+  currentPage?: "saved";
+}
+
+export function SiteHeader({ currentPage }: SiteHeaderProps = {}) {
   return (
     <header className="border-b border-orange-100/80 bg-white/70 backdrop-blur">
       <nav
@@ -25,7 +29,7 @@ export function SiteHeader() {
             Little Plans Around Here
           </span>
         </Link>
-        <SavedLink />
+        <SavedLink isActive={currentPage === "saved"} />
       </nav>
     </header>
   );

@@ -2,7 +2,6 @@
 
 import { Heart } from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { useSyncExternalStore } from "react";
 
 import {
@@ -27,9 +26,12 @@ function getSavedCount() {
   }
 }
 
-export function SavedLink() {
-  const pathname = usePathname();
-  const isActive = pathname === "/saved";
+interface SavedLinkProps {
+  /** Set when rendered on the Saved page so the link shows as current. */
+  isActive?: boolean;
+}
+
+export function SavedLink({ isActive = false }: SavedLinkProps) {
   const count = useSyncExternalStore(subscribe, getSavedCount, () => 0);
 
   return (
