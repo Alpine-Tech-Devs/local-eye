@@ -101,7 +101,7 @@ export function EventCard({
   return (
     <article className="overflow-hidden rounded-xl border border-slate-200 bg-white">
       <div
-        className={`relative flex h-28 items-end px-5 pb-3 sm:px-6 ${categoryStyle}`}
+        className={`relative flex h-16 items-center px-5 sm:px-6 ${categoryStyle}`}
       >
         {imageUrl && (
           <Image
