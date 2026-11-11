@@ -6,7 +6,7 @@ Companion to [PRODUCT.md](PRODUCT.md) and the archived MVP plan in [PLAN_V1.md](
 
 ## Phase 1 — Recurring Event Automation
 
-**Status:** Implementation complete and locally verified. Production activation requires applying the migration and setting the Vercel environment variables.
+**Status:** Complete (implemented and locally verified). Production activation still requires applying the migration and setting the Vercel environment variables.
 
 **Goal:** Enter one-time events in `events` or add a recurring series once in Supabase Studio, so generated occurrences appear in search without weekly manual entry.
 
