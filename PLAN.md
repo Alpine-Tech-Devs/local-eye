@@ -6,16 +6,18 @@ Companion to [PRODUCT.md](PRODUCT.md) and the archived MVP plan in [PLAN_V1.md](
 
 ## Phase 1 — Recurring Event Automation
 
-**Goal:** Automatically keep recurring events in the database and available in search so they do not need to be added manually each week.
+**Status:** Implementation complete and locally verified. Production activation requires applying the migration and setting the Vercel environment variables.
 
-1. Identify reliable sources for recurring events, prioritizing structured calendars or feeds from libraries and other local organizers.
-2. Define how a recurring event is represented, including its source, stable external identifier, schedule, and any exceptions or cancellations.
-3. Implement an importer that expands each recurrence into dated event records within the search horizon and upserts them by stable source/event identity and occurrence date.
-4. Ensure updated schedules refresh existing records, cancelled occurrences stop appearing in search, and failed or incomplete imports do not remove valid events.
-5. Run the importer on a schedule and record the last successful sync so stale or failed imports can be detected.
-6. Verify generated occurrences use the existing event schema and database fields and are returned by the normal search query.
+**Goal:** Enter one-time events in `events` or add a recurring series once in Supabase Studio, so generated occurrences appear in search without weekly manual entry.
 
-**Checkpoint:** A recurring event is automatically refreshed into searchable dated events without weekly manual database entry; repeated syncs create no duplicates.
+1. Use the existing `events` table for one-time events and a separate `recurring_event_series` row for a recurring event.
+2. Store weekly or monthly recurrence, the weekday or day of month, start time, duration, time zone, and optional end date on the series.
+3. Generate dated occurrence rows in `events` within the search horizon, linked to their series and uniquely identified by series and date.
+4. Make generation idempotent; edits refresh future events while preserving past events.
+5. Support individual cancellations through `recurring_event_exceptions` and deactivate a series to cancel its future occurrences.
+6. Run the generator daily through a bearer-secret-protected route and Vercel Cron; generated rows use the existing event schema and search query.
+
+**Checkpoint:** A weekly or monthly series entered once in Supabase Studio produces searchable dated events without duplicates or weekly manual entry.
 
 ---
 

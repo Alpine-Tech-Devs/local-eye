@@ -31,8 +31,44 @@ supabase gen types typescript --linked --schema public > lib/supabase/database.t
 ```
 
 The home page makes a small server-side query to `events` as a connectivity
-check. Database schema migrations are separate from seed data; production
-events will be populated by the ingestion pipeline in Phase 3.
+check. Database schema migrations are separate from event data.
+
+## Recurring events
+
+Apply the migrations, then enter one-time events directly in the `events` table
+using Supabase Studio. For recurring events, add one row to
+`recurring_event_series` instead; the daily generator creates dated `events`
+rows that the existing search can find. Do not add generated occurrences
+manually.
+
+The series table stores the shared event details plus:
+
+- `recurrence_frequency`: `weekly` or `monthly`
+- `day_of_week`: ISO weekday number (`1` Monday through `7` Sunday) for weekly
+  recurrences; leave `day_of_month` empty
+- `day_of_month`: `1` through `31` for monthly recurrences; leave `day_of_week`
+  empty. Months without that date are skipped.
+- `start_date` and optional `end_date`
+- `start_time`, `duration_minutes`, and `time_zone` (default
+  `America/New_York`)
+- `is_active`: set to false to cancel future occurrences. Keep the series row
+  rather than deleting it; generated event rows retain their series reference.
+
+After adding a series or a cancellation exception, run
+`select public.generate_recurring_event_occurrences(365);` in the Supabase SQL
+Editor to generate or refresh occurrences immediately. To cancel one
+occurrence, add its date to `recurring_event_exceptions` for that series and
+run the generator. Updating a series refreshes future occurrences; past events
+are left unchanged. Future events no longer matching an edited schedule are
+marked cancelled.
+
+Vercel runs the same generator daily using the schedule in `vercel.json`. Set
+`CRON_SECRET` and `SUPABASE_SERVICE_ROLE_KEY` in the Vercel project environment;
+the endpoint rejects requests without `Authorization: Bearer <CRON_SECRET>`.
+For local development, set `CRON_SECRET` in `.env.local` and call the endpoint
+with that authorization header, or run the SQL function directly in Supabase
+Studio. Run `pnpm test:db` with local Supabase running to exercise weekly and
+monthly generation, duplicate prevention, schedule edits, and cancellations.
 
 ## Useful commands
 

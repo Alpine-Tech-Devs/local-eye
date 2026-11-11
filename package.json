@@ -10,6 +10,7 @@
     "lint": "eslint",
     "typecheck": "next typegen && tsc --noEmit",
     "test": "vitest run",
+    "test:db": "supabase db query --local --file supabase/tests/recurring_events.sql",
     "test:e2e": "playwright test"
   },
   "dependencies": {
