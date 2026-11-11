@@ -1,6 +1,6 @@
 # Local Eye — Project Plan
 
-Companion to [PRODUCT.md](PRODUCT.md) and the archived MVP plan in [MVP.md](MVP.md). This plan keeps the broader roadmap intact while explicitly including the ingestion work that powers the live catalog and the later expansion phase.
+Companion to [PRODUCT.md](PRODUCT.md) and the archived MVP plan in [PLAN_V1.md](PLAN_V1.md). This plan keeps the broader roadmap intact while explicitly including the ingestion work that powers the live catalog and the later expansion phase.
 
 ---
 
