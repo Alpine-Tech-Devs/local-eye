@@ -202,6 +202,8 @@ export type Database = {
           recurrence_frequency: "weekly" | "monthly"
           registration_required: boolean
           registration_url: string | null
+          source_id: string | null
+          external_id: string | null
           source_name: string
           source_url: string
           start_date: string
@@ -236,6 +238,8 @@ export type Database = {
           recurrence_frequency: "weekly" | "monthly"
           registration_required?: boolean
           registration_url?: string | null
+          source_id?: string | null
+          external_id?: string | null
           source_name: string
           source_url: string
           start_date: string
@@ -270,6 +274,8 @@ export type Database = {
           recurrence_frequency?: "weekly" | "monthly"
           registration_required?: boolean
           registration_url?: string | null
+          source_id?: string | null
+          external_id?: string | null
           source_name?: string
           source_url?: string
           start_date?: string
@@ -289,6 +295,10 @@ export type Database = {
     Functions: {
       generate_recurring_event_occurrences: {
         Args: { p_days_ahead?: number }
+        Returns: number
+      }
+      sync_south_berwick_littles_storytime: {
+        Args: { p_exceptions: Json; p_series: Json }
         Returns: number
       }
     }

@@ -37,6 +37,8 @@ Companion to [PRODUCT.md](PRODUCT.md) and the archived MVP plan in [PLAN_V1.md](
 
 ### Phase 2a — Library Storytimes (first dataset)
 
+**Status:** South Berwick Public Library Littles' Storytime and Pre-K Storytime ICS import is implemented and locally verified. Importing requires a fresh calendar export, applied migrations, and local Supabase credentials.
+
 **Goal:** Add a real, recurring, high-signal data source quickly.
 
 1. Prioritize recurring library storytimes as the initial source family.

@@ -1,0 +1,65 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Local Eye//South Berwick Library Test Fixture//EN
+BEGIN:VEVENT
+UID:old-littles@default
+SUMMARY:Littles' Storytime
+DESCRIPTION:Thursdays at 10:30 AMJoin us for books, songs, rhymes, and bounces!Followed by a time for adults and littles to play and socialize.Designed for ages 0-24 months.
+DTSTART:20250911T143000Z
+DTEND:20250911T153000Z
+RRULE:FREQ=WEEKLY;INTERVAL=1;BYDAY=TH;UNTIL=20251220T000000
+EXDATE:20251127T103000
+END:VEVENT
+BEGIN:VEVENT
+UID:2026-spring-littles@default
+SUMMARY:Littles' Storytime
+DESCRIPTION:Thursdays at 10:30 AM Designed for ages 0-24 months.
+DTSTART:20260115T153000Z
+DTEND:20260115T160000Z
+RRULE:FREQ=WEEKLY;INTERVAL=1;BYDAY=TH;UNTIL=20260529T000000
+EXDATE:20260305T103000
+EXDATE:20260528T103000
+END:VEVENT
+BEGIN:VEVENT
+UID:summer-littles@default
+SUMMARY:Littles' Storytime
+DESCRIPTION:Thursdays at 10:30 AM Designed for ages 0-24 months.
+DTSTART:20260702T143000Z
+DTEND:20260702T151500Z
+RRULE:FREQ=WEEKLY;INTERVAL=1;BYDAY=TH;COUNT=9
+END:VEVENT
+BEGIN:VEVENT
+UID:fall-littles@default
+SUMMARY:Littles' Storytime
+DESCRIPTION:Thursdays, 10:30 AMJoin us for books, songs, rhymes, and bounces!Followed by a time for adults and littles to play and socialize.Designed for ages 0-24 months.
+DTSTART:20260924T143000Z
+DTEND:20260924T151500Z
+RRULE:FREQ=WEEKLY;INTERVAL=1;BYDAY=TH;UNTIL=20261218T000000
+EXDATE:20261126T103000
+END:VEVENT
+BEGIN:VEVENT
+UID:pre-k-storytime@default
+SUMMARY:Pre-K Storytime
+DESCRIPTION:Wednesdays, 10:30 amJoin us for books, songs, and activities centered around a different theme every week!Followed by a craft.Designed for ages 2-5, but all ages welcome!
+DTSTART:20260114T153000Z
+DTEND:20260114T161500Z
+RRULE:FREQ=WEEKLY;INTERVAL=1;BYDAY=WE;UNTIL=20260529T000000
+EXDATE:20260204T103000
+END:VEVENT
+BEGIN:VEVENT
+UID:cancelled-littles@default
+SUMMARY:Littles' Storytime
+DESCRIPTION:Thursdays at 10:30 AM Designed for ages 0-24 months.
+DTSTART:20270107T153000Z
+DTEND:20270107T161500Z
+RRULE:FREQ=WEEKLY;INTERVAL=1;BYDAY=TH;COUNT=4
+STATUS:CANCELLED
+END:VEVENT
+BEGIN:VEVENT
+UID:one-off-littles@default
+SUMMARY:Littles' Storytime
+DESCRIPTION:One-time program for ages 0-24 months.
+DTSTART:20270114T153000Z
+DTEND:20270114T161500Z
+END:VEVENT
+END:VCALENDAR

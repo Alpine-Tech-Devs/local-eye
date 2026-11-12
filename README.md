@@ -70,10 +70,43 @@ with that authorization header, or run the SQL function directly in Supabase
 Studio. Run `pnpm test:db` with local Supabase running to exercise weekly and
 monthly generation, duplicate prevention, schedule edits, and cancellations.
 
+## South Berwick Library ICS import
+
+The South Berwick Public Library importer accepts recurring entries titled
+exactly `Littles' Storytime` or `Pre-K Storytime`. It reads the ICS recurrence
+rule and excluded dates, and does not import the library's other programs.
+
+This library provides an export file rather than a live feed URL, so import it
+from your local machine whenever you download an updated calendar. There is no
+ICS ingestion cron; new changes in the library calendar will not be reflected
+until you run the command again.
+
+Set these variables in `.env.local`:
+
+- `NEXT_PUBLIC_SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY`: the target
+  Supabase project and server-only write credential
+- `SOUTH_BERWICK_LIBRARY_EVENTS_URL`: the library event page to show as the
+  event's source link
+
+```bash
+pnpm ingest:south-berwick -- "/path/to/Full Calendar.ics"
+```
+
+The importer preserves the calendar's event UIDs for idempotent updates,
+converts times to `America/New_York`, derives the age range from each event's
+description, and syncs `EXDATE` exceptions and cancelled series. The database sync runs
+transactionally, deactivates series removed from a successfully parsed feed,
+and generates searchable occurrences.
+Unsupported recurrence rules, an unreadable file, missing credentials, or an
+export without the target event stop the import without changing existing
+database rows. Apply the migrations to the selected Supabase project before
+running the command.
+
 ## Useful commands
 
 ```bash
 pnpm lint
 pnpm test
+pnpm test:db
 pnpm build
 ```
