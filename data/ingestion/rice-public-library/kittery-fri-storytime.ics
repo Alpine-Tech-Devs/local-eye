@@ -1,0 +1,18 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Library Market//iCal Export//EN
+BEGIN:VEVENT
+SUMMARY:Story Time!
+UID:7890
+DTSTAMP:20261112T030600Z
+DTSTART:20261106T153000Z
+DTEND:20261106T163000Z
+LOCATION:Rice Public Library, 8 Wentworth St, Kittery, ME 03904, United St
+ ates
+ROOM: Children&#039;s Room
+DESCRIPTION:Sing songs, read stories, and do a fun craft in the children&
+ #039;s room with Miss Sarah! Story Time is open to all children ages 0-5 
+ and their caregivers.  No registration needed; just come on by!
+URL:https://ricepl.librarycalendar.com/event/copy-story-time-7890
+END:VEVENT
+END:VCALENDAR

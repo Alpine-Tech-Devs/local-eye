@@ -58,6 +58,8 @@ export type Database = {
           min_age: number | null
           price_max: number | null
           price_min: number | null
+          recurrence_date: string | null
+          recurring_series_id: string | null
           registration_required: boolean
           registration_url: string | null
           source_id: string | null
@@ -89,6 +91,8 @@ export type Database = {
           min_age?: number | null
           price_max?: number | null
           price_min?: number | null
+          recurrence_date?: string | null
+          recurring_series_id?: string | null
           registration_required?: boolean
           registration_url?: string | null
           source_id?: string | null
@@ -120,6 +124,8 @@ export type Database = {
           min_age?: number | null
           price_max?: number | null
           price_min?: number | null
+          recurrence_date?: string | null
+          recurring_series_id?: string | null
           registration_required?: boolean
           registration_url?: string | null
           source_id?: string | null
@@ -132,6 +138,183 @@ export type Database = {
           updated_at?: string
           venue_name?: string
         }
+        Relationships: [
+          {
+            foreignKeyName: "events_recurring_series_id_fkey"
+            columns: ["recurring_series_id"]
+            isOneToOne: false
+            referencedRelation: "recurring_event_series"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      recurring_event_exceptions: {
+        Row: {
+          created_at: string
+          occurrence_date: string
+          reason: string | null
+          series_id: string
+        }
+        Insert: {
+          created_at?: string
+          occurrence_date: string
+          reason?: string | null
+          series_id: string
+        }
+        Update: {
+          created_at?: string
+          occurrence_date?: string
+          reason?: string | null
+          series_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "recurring_event_exceptions_series_id_fkey"
+            columns: ["series_id"]
+            isOneToOne: false
+            referencedRelation: "recurring_event_series"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rice_public_library_occurrence_source_links: {
+        Row: {
+          created_at: string
+          occurrence_date: string
+          series_id: string
+          source_url: string
+        }
+        Insert: {
+          created_at?: string
+          occurrence_date: string
+          series_id: string
+          source_url: string
+        }
+        Update: {
+          created_at?: string
+          occurrence_date?: string
+          series_id?: string
+          source_url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rice_public_library_occurrence_source_links_series_id_fkey"
+            columns: ["series_id"]
+            isOneToOne: false
+            referencedRelation: "recurring_event_series"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      recurring_event_series: {
+        Row: {
+          address: string | null
+          category: Database["public"]["Enums"]["event_category"]
+          city: string
+          created_at: string
+          day_of_month: number | null
+          day_of_week: number | null
+          description: string | null
+          duration_minutes: number
+          end_date: string | null
+          id: string
+          image_url: string | null
+          indoor_outdoor: Database["public"]["Enums"]["indoor_outdoor"]
+          is_active: boolean
+          is_free: boolean
+          latitude: number
+          longitude: number
+          max_age: number | null
+          min_age: number | null
+          price_max: number | null
+          price_min: number | null
+          recurrence_frequency: "weekly" | "monthly"
+          registration_required: boolean
+          registration_url: string | null
+          source_id: string | null
+          external_id: string | null
+          source_name: string
+          source_url: string
+          start_date: string
+          start_time: string
+          state: string
+          time_zone: string
+          title: string
+          updated_at: string
+          venue_name: string
+        }
+        Insert: {
+          address?: string | null
+          category: Database["public"]["Enums"]["event_category"]
+          city: string
+          created_at?: string
+          day_of_month?: number | null
+          day_of_week?: number | null
+          description?: string | null
+          duration_minutes: number
+          end_date?: string | null
+          id?: string
+          image_url?: string | null
+          indoor_outdoor?: Database["public"]["Enums"]["indoor_outdoor"]
+          is_active?: boolean
+          is_free?: boolean
+          latitude: number
+          longitude: number
+          max_age?: number | null
+          min_age?: number | null
+          price_max?: number | null
+          price_min?: number | null
+          recurrence_frequency: "weekly" | "monthly"
+          registration_required?: boolean
+          registration_url?: string | null
+          source_id?: string | null
+          external_id?: string | null
+          source_name: string
+          source_url: string
+          start_date: string
+          start_time: string
+          state: string
+          time_zone?: string
+          title: string
+          updated_at?: string
+          venue_name: string
+        }
+        Update: {
+          address?: string | null
+          category?: Database["public"]["Enums"]["event_category"]
+          city?: string
+          created_at?: string
+          day_of_month?: number | null
+          day_of_week?: number | null
+          description?: string | null
+          duration_minutes?: number
+          end_date?: string | null
+          id?: string
+          image_url?: string | null
+          indoor_outdoor?: Database["public"]["Enums"]["indoor_outdoor"]
+          is_active?: boolean
+          is_free?: boolean
+          latitude?: number
+          longitude?: number
+          max_age?: number | null
+          min_age?: number | null
+          price_max?: number | null
+          price_min?: number | null
+          recurrence_frequency?: "weekly" | "monthly"
+          registration_required?: boolean
+          registration_url?: string | null
+          source_id?: string | null
+          external_id?: string | null
+          source_name?: string
+          source_url?: string
+          start_date?: string
+          start_time?: string
+          state?: string
+          time_zone?: string
+          title?: string
+          updated_at?: string
+          venue_name?: string
+        }
         Relationships: []
       }
     }
@@ -139,7 +322,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      generate_recurring_event_occurrences: {
+        Args: { p_days_ahead?: number }
+        Returns: number
+      }
+      sync_south_berwick_littles_storytime: {
+        Args: { p_exceptions: Json; p_series: Json }
+        Returns: number
+      }
     }
     Enums: {
       analytics_event_type:

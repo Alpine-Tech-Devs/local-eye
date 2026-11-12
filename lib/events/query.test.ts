@@ -20,6 +20,8 @@ const EVENT_ROW: Database["public"]["Tables"]["events"]["Row"] = {
   state: "NH",
   latitude: 43.0718,
   longitude: -70.7626,
+  recurrence_date: null,
+  recurring_series_id: null,
   start_datetime: "2026-11-03T10:30:00-05:00",
   end_datetime: "2026-11-03T11:00:00-05:00",
   min_age: 2,
