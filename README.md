@@ -117,9 +117,12 @@ pnpm ingest:rice-library
 ```
 
 It upserts only the Rice Public Library series, then generates searchable
-occurrences. Set `NEXT_PUBLIC_SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` in
-`.env.local`; the selected Supabase project must have the recurring-event
-migrations applied.
+occurrences. Before writing, it fetches the public calendar fragment for each
+scheduled date, extracts that date's Story Time detail-page link, and waits
+one second between requests. It records November 27, 2026 as canceled for
+Thanksgiving. Set `NEXT_PUBLIC_SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY`
+in `.env.local`; the selected Supabase project must have the Rice occurrence
+source-link and recurring-event migrations applied.
 
 ## Useful commands
 

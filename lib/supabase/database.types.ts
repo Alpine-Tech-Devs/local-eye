@@ -177,6 +177,35 @@ export type Database = {
           },
         ]
       }
+      rice_public_library_occurrence_source_links: {
+        Row: {
+          created_at: string
+          occurrence_date: string
+          series_id: string
+          source_url: string
+        }
+        Insert: {
+          created_at?: string
+          occurrence_date: string
+          series_id: string
+          source_url: string
+        }
+        Update: {
+          created_at?: string
+          occurrence_date?: string
+          series_id?: string
+          source_url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rice_public_library_occurrence_source_links_series_id_fkey"
+            columns: ["series_id"]
+            isOneToOne: false
+            referencedRelation: "recurring_event_series"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       recurring_event_series: {
         Row: {
           address: string | null

@@ -21,7 +21,33 @@ Companion to [PRODUCT.md](PRODUCT.md) and the archived MVP plan in [PLAN_V1.md](
 
 ---
 
-## Phase 2 — Dynamic Event Ingestion
+## Phase 2 — Library Storytime Ingestion
+
+**Status:** South Berwick Public Library and Rice Public Library storytime importers are implemented and locally verified. Production rollout remains pending migration deployment, production credentials, and source imports.
+
+**Goal:** Populate the catalog with reliable recurring events from local libraries using their exported calendars and public event pages.
+
+### Phase 2a — South Berwick Public Library Storytimes
+
+1. Import recurring Littles' Storytime and Pre-K Storytime entries from the full South Berwick calendar export.
+2. Preserve ICS UIDs for idempotent series updates; parse weekly recurrence, age ranges, excluded dates, and canceled series.
+3. Normalize descriptions, use the library address and indoor setting, and generate searchable dated occurrences.
+4. Run manually with `pnpm ingest:south-berwick -- "/path/to/south-berwick-full-calendar.ics"` because the calendar is a downloaded export, not a live feed.
+
+### Phase 2b — Rice Public Library Storytimes
+
+1. Read the Tuesday and Friday Story Time ICS files and create weekly series with the exported times and durations, for children ages 0–5, through six months from each import.
+2. Fetch each scheduled date's public calendar fragment and save the matching event detail-page URL on that occurrence.
+3. Persist the November 27, 2026 Thanksgiving cancellation as a recurring-event exception.
+4. Run with `pnpm ingest:rice-library`; the importer fetches date fragments at a one-second interval before writing to Supabase.
+
+Both importers use source-specific identities and upsert existing series rather than creating duplicate series. Test fixtures cover parsing and recurrence behavior.
+
+**Production rollout:** Apply the tracked Supabase migrations to production, configure the target Supabase URL and service-role key, then run each importer against the intended source data. Use the complete South Berwick export; a partial export can deactivate source series omitted from that import. Local imports and manual local corrections do not transfer to production.
+
+---
+
+## Phase 3 — Dynamic Event Ingestion
 
 **Goal:** Populate and refresh the MVP catalog using a small set of reliable, real Seacoast sources rather than hand-authored records.
 
@@ -35,21 +61,9 @@ Companion to [PRODUCT.md](PRODUCT.md) and the archived MVP plan in [PLAN_V1.md](
 
 **Checkpoint:** Repeated syncs update existing records without duplication and refresh the catalog without exposing secrets.
 
-### Phase 2a — Library Storytimes (first dataset)
-
-**Status:** South Berwick Public Library Littles' Storytime and Pre-K Storytime ICS import is implemented and locally verified. Importing requires a fresh calendar export, applied migrations, and local Supabase credentials.
-
-**Goal:** Add a real, recurring, high-signal data source quickly.
-
-1. Prioritize recurring library storytimes as the initial source family.
-2. Build the ingestion adapter for the feed format and validate output against the shared event schema.
-3. Confirm recurring events appear and update correctly over repeated syncs.
-
-**Checkpoint:** The first live source family is operational and producing recurring event entries.
-
 ---
 
-## Phase 3 — Ingestion Expansion (post-MVP)
+## Phase 4 — Ingestion Expansion (post-MVP)
 
 **Goal:** Expand source coverage after the initial dynamic pipeline proves reliable.
 
