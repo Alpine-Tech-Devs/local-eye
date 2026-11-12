@@ -12,6 +12,7 @@
     "test": "vitest run",
     "test:db": "supabase db query --local --file supabase/tests/recurring_events.sql && supabase db query --local --file supabase/tests/south_berwick_ics.sql",
     "ingest:south-berwick": "tsx scripts/ingest-south-berwick-library.ts",
+    "ingest:rice-library": "tsx scripts/ingest-rice-public-library.ts",
     "test:e2e": "playwright test"
   },
   "dependencies": {

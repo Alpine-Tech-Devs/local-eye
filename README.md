@@ -102,6 +102,25 @@ export without the target event stop the import without changing existing
 database rows. Apply the migrations to the selected Supabase project before
 running the command.
 
+## Rice Public Library ICS import
+
+The Rice Public Library importer reads the Tuesday and Friday Story Time
+exports from `data/ingestion/rice-public-library/`. It uses the event UID for
+idempotent updates and schedules each event weekly at the time and duration
+in its export, from the next occurrence through six months from the import
+date.
+
+Run the importer after updating those local ICS files:
+
+```bash
+pnpm ingest:rice-library
+```
+
+It upserts only the Rice Public Library series, then generates searchable
+occurrences. Set `NEXT_PUBLIC_SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` in
+`.env.local`; the selected Supabase project must have the recurring-event
+migrations applied.
+
 ## Useful commands
 
 ```bash
