@@ -81,15 +81,30 @@ from your local machine whenever you download an updated calendar. There is no
 ICS ingestion cron; new changes in the library calendar will not be reflected
 until you run the command again.
 
-Set these variables in `.env.local`:
+For local imports, set these variables in a development env file such as
+`.env.development.local`:
 
 - `NEXT_PUBLIC_SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY`: the target
   Supabase project and server-only write credential
 - `SOUTH_BERWICK_LIBRARY_EVENTS_URL`: the library event page to show as the
   event's source link
 
+Import commands use development env files by default. To run an importer
+against production, set the production values in `.env.production.local`,
+`.env.production`, or `.env`, then set `INGEST_ENV=production` for the command.
+This skips `.env.development.local`. Next.js still loads `.env.local` in
+production mode, with higher priority than `.env.production` and `.env`, so
+ensure it does not contain conflicting Supabase values. Check the target URL
+before importing. The service-role key must remain server-only.
+
 ```bash
 pnpm ingest:south-berwick -- "/path/to/Full Calendar.ics"
+```
+
+For production, use `INGEST_ENV=production`:
+
+```bash
+INGEST_ENV=production pnpm ingest:south-berwick -- "/path/to/Full Calendar.ics"
 ```
 
 The importer preserves the calendar's event UIDs for idempotent updates,
@@ -116,13 +131,15 @@ Run the importer after updating those local ICS files:
 pnpm ingest:rice-library
 ```
 
+For production, run `INGEST_ENV=production pnpm ingest:rice-library`.
+
 It upserts only the Rice Public Library series, then generates searchable
 occurrences. Before writing, it fetches the public calendar fragment for each
 scheduled date, extracts that date's Story Time detail-page link, and waits
 one second between requests. It records November 27, 2026 as canceled for
 Thanksgiving. Set `NEXT_PUBLIC_SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY`
-in `.env.local`; the selected Supabase project must have the Rice occurrence
-source-link and recurring-event migrations applied.
+in the selected environment; the selected Supabase project must have the Rice
+occurrence source-link and recurring-event migrations applied.
 
 ## Useful commands
 

@@ -26,7 +26,11 @@ function getPublicHttpsUrl(value: string | undefined, name: string): URL {
 }
 
 async function main() {
-  loadEnvConfig(process.cwd(), true);
+  const ingestionEnv = process.env.INGEST_ENV ?? "development";
+  if (ingestionEnv !== "development" && ingestionEnv !== "production") {
+    throw new Error('INGEST_ENV must be either "development" or "production".');
+  }
+  loadEnvConfig(process.cwd(), ingestionEnv === "development");
 
   const args =
     process.argv[2] === "--" ? process.argv.slice(3) : process.argv.slice(2);
@@ -60,7 +64,7 @@ async function main() {
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
   if (!supabaseUrl || !serviceRoleKey) {
     throw new Error(
-      "Set NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in .env.local.",
+      "Set NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in the selected environment.",
     );
   }
 
