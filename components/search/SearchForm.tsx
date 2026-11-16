@@ -348,8 +348,13 @@ export function SearchForm({ initialFilters, hasUrlFilters }: SearchFormProps) {
                         }
                       >
                         {TOWNS.map((town) => (
-                          <option key={town.slug} value={town.slug}>
+                          <option
+                            key={town.slug}
+                            value={town.slug}
+                            disabled={!town.isAvailable}
+                          >
                             {town.name}, {town.state}
+                            {!town.isAvailable && " — Coming soon"}
                           </option>
                         ))}
                       </select>
