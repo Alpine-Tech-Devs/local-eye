@@ -75,8 +75,15 @@ function formatAges(event: Event) {
   return `Ages ${event.minAge}–${event.maxAge}`;
 }
 
+function formatMatchingAge(age: number) {
+  if (age === 0) return "under 1";
+  if (age === 12) return "12+";
+  return String(age);
+}
+
 export interface EventCardProps {
   event: Event;
+  matchingChildAges?: number[];
   distanceMiles?: number;
   flexible?: boolean;
   resultPosition?: number;
@@ -84,6 +91,7 @@ export interface EventCardProps {
 
 export function EventCard({
   event,
+  matchingChildAges = [],
   distanceMiles,
   flexible = false,
   resultPosition,
@@ -193,6 +201,14 @@ export function EventCard({
           <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-700">
             {formatAges(event)}
           </span>
+          {matchingChildAges.map((age) => (
+            <span
+              className="rounded-full bg-orange-50 px-3 py-1 text-xs font-medium text-orange-800"
+              key={age}
+            >
+              Matches age {formatMatchingAge(age)}
+            </span>
+          ))}
           {event.registrationRequired && (
             <span className="rounded-full bg-amber-50 px-3 py-1 text-xs font-medium text-amber-900">
               Registration required

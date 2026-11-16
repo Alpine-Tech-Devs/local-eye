@@ -46,7 +46,7 @@ const EVENT_ROW: Database["public"]["Tables"]["events"]["Row"] = {
 
 function makeFilters(overrides: Partial<SearchFilters> = {}): SearchFilters {
   return {
-    childAge: 3,
+    childAges: [3],
     date: { preset: "today" },
     timeOfDay: "morning",
     maxDistanceMiles: 25,

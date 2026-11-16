@@ -1,9 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import {
-  DEFAULT_SEARCH_FILTERS,
-  type SearchFilters,
-} from "./filters";
+import { DEFAULT_SEARCH_FILTERS, type SearchFilters } from "./filters";
 import {
   getRelaxedSearchFilters,
   matchesEventFilters,
@@ -58,16 +55,21 @@ function makeFilters(overrides: Partial<SearchFilters> = {}): SearchFilters {
 describe("matchesEventFilters", () => {
   it("matches the selected local date, time, age, environment, budget, and distance", () => {
     const filters = makeFilters({
-      childAge: 3,
+      childAges: [3, 6],
       environment: "indoor",
       budget: "under10",
       maxDistanceMiles: 5,
     });
 
-    expect(matchesEventFilters(makeEvent({ minAge: 2, maxAge: 4 }), filters, NOW))
-      .toBe(true);
-    expect(matchesEventFilters(makeEvent({ minAge: 4, maxAge: 5 }), filters, NOW))
-      .toBe(false);
+    expect(
+      matchesEventFilters(makeEvent({ minAge: 2, maxAge: 4 }), filters, NOW),
+    ).toBe(true);
+    expect(
+      matchesEventFilters(makeEvent({ minAge: 5, maxAge: 7 }), filters, NOW),
+    ).toBe(true);
+    expect(
+      matchesEventFilters(makeEvent({ minAge: 4, maxAge: 5 }), filters, NOW),
+    ).toBe(false);
     expect(
       matchesEventFilters(
         makeEvent({ indoorOutdoor: "outdoor" }),
@@ -78,7 +80,7 @@ describe("matchesEventFilters", () => {
   });
 
   it("treats unknown age bounds and either environment as inclusive", () => {
-    const filters = makeFilters({ childAge: 2, environment: "outdoor" });
+    const filters = makeFilters({ childAges: [2, 6], environment: "outdoor" });
     expect(
       matchesEventFilters(
         makeEvent({ minAge: null, maxAge: null, indoorOutdoor: "either" }),
@@ -110,7 +112,7 @@ describe("matchesEventFilters", () => {
 describe("rankEvents", () => {
   it("ranks relevant age, distance, time, free, and fresh events above weaker matches", () => {
     const filters = makeFilters({
-      childAge: 3,
+      childAges: [3],
       budget: "under10",
       maxDistanceMiles: 25,
     });
@@ -130,8 +132,37 @@ describe("rankEvents", () => {
       lastVerifiedAt: "2026-03-01T00:00:00.000Z",
     });
 
-    expect(rankEvents([fartherAndStale, closeAndFresh], filters, NOW)[0].event)
-      .toEqual(closeAndFresh);
+    expect(
+      rankEvents([fartherAndStale, closeAndFresh], filters, NOW)[0].event,
+    ).toEqual(closeAndFresh);
+  });
+
+  it("marks the child age groups matched by each ranked event", () => {
+    const event = makeEvent({ minAge: 2, maxAge: 4 });
+    const [ranked] = rankEvents(
+      [event],
+      makeFilters({ childAges: [2, 6, 2] }),
+      NOW,
+    );
+
+    expect(ranked.matchingChildAges).toEqual([2]);
+  });
+
+  it("ranks events that suit more selected age groups higher", () => {
+    const filters = makeFilters({ childAges: [2, 6] });
+    const oneAgeMatch = makeEvent({
+      minAge: 2,
+      maxAge: 3,
+    });
+    const bothAgeMatches = makeEvent({
+      id: "00000000-0000-4000-8000-000000000002",
+      minAge: 2,
+      maxAge: 6,
+    });
+
+    expect(
+      rankEvents([oneAgeMatch, bothAgeMatches], filters, NOW)[0].event,
+    ).toEqual(bothAgeMatches);
   });
 
   it("uses start time and stable text keys as deterministic tie-breakers", () => {
@@ -145,8 +176,9 @@ describe("rankEvents", () => {
       startDateTime: "2026-11-03T10:45:00-05:00",
     });
 
-    expect(rankEvents([later, earlier], filters, NOW).map(({ event }) => event.id))
-      .toEqual([earlier.id, later.id]);
+    expect(
+      rankEvents([later, earlier], filters, NOW).map(({ event }) => event.id),
+    ).toEqual([earlier.id, later.id]);
   });
 
   it("prefers events near the center of the selected time window", () => {

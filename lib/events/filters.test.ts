@@ -4,6 +4,8 @@ import {
   DEFAULT_SEARCH_FILTERS,
   filtersToSearchParams,
   parseFiltersFromSearchParams,
+  SearchFiltersSchema,
+  type SearchFilters,
 } from "./filters";
 
 describe("SearchFilters URL serialization", () => {
@@ -13,35 +15,54 @@ describe("SearchFilters URL serialization", () => {
     );
   });
 
-  it("round-trips custom dates, child age, and coordinate origins", () => {
+  it("round-trips custom dates, multiple child ages, and coordinate origins", () => {
     const filters = {
-      childAge: 2,
+      childAges: [2, 6],
       date: { preset: "custom", date: "2026-10-28" },
       timeOfDay: "morning",
       maxDistanceMiles: 15,
       budget: "under20",
       environment: "indoor",
       origin: { lat: 43.0718, lng: -70.7626 },
-    } as const;
+    } satisfies SearchFilters;
 
     expect(
       parseFiltersFromSearchParams(filtersToSearchParams(filters)),
     ).toEqual(filters);
   });
 
-  it("accepts town slugs and the framework searchParams object shape", () => {
+  it("accepts multiple ages and the framework searchParams object shape", () => {
     expect(
       parseFiltersFromSearchParams({
         date: "weekend",
         origin: "dover",
-        childAge: "4",
+        childAges: ["2", "6"],
       }),
     ).toEqual({
       ...DEFAULT_SEARCH_FILTERS,
-      childAge: 4,
+      childAges: [2, 6],
       date: { preset: "weekend" },
       origin: "dover",
     });
+  });
+
+  it("continues to parse legacy single-age URLs and saved filters", () => {
+    expect(
+      parseFiltersFromSearchParams({
+        childAge: "4",
+      }),
+    ).toEqual({ ...DEFAULT_SEARCH_FILTERS, childAges: [4] });
+    expect(
+      SearchFiltersSchema.parse({
+        date: { preset: "today" },
+        timeOfDay: "anytime",
+        maxDistanceMiles: 25,
+        budget: "any",
+        environment: "either",
+        origin: "portsmouth",
+        childAge: 3,
+      }),
+    ).toEqual({ ...DEFAULT_SEARCH_FILTERS, childAges: [3] });
   });
 
   it("falls back to defaults for invalid input", () => {

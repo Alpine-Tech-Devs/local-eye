@@ -4,7 +4,7 @@ const eventId = z.uuid();
 
 const searchPayload = z.object({
   filters: z.object({
-    childAge: z.number().int().min(0).max(18).optional(),
+    childAges: z.array(z.number().int().min(0).max(18)).default([]),
     date: z.discriminatedUnion("preset", [
       z.object({ preset: z.enum(["today", "tomorrow", "weekend"]) }),
       z.object({ preset: z.literal("custom"), date: z.iso.date() }),

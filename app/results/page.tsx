@@ -18,13 +18,22 @@ interface ResultsPageProps {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }
 
+function formatChildAge(age: number) {
+  if (age === 0) return "under 1";
+  if (age === 12) return "12+";
+  return String(age);
+}
+
 function getSearchSummary(
   filters: ReturnType<typeof parseFiltersFromSearchParams>,
 ) {
+  const childAges = [...new Set(filters.childAges)].sort((a, b) => a - b);
   const age =
-    filters.childAge === undefined
+    childAges.length === 0
       ? "any age"
-      : `${filters.childAge === 0 ? "under 1" : `${filters.childAge}-year-old`}`;
+      : childAges.length === 1
+        ? `age ${formatChildAge(childAges[0])}`
+        : `ages ${childAges.map(formatChildAge).join(" or ")}`;
   let date: string;
   switch (filters.date.preset) {
     case "today":
@@ -116,14 +125,17 @@ async function ResultsContent({ searchParams }: ResultsPageProps) {
                 {search.totalResults === 1 ? "Your match" : "Best matches"}
               </h2>
               <div className="space-y-4">
-                {exactResults.map(({ event, distanceMiles }, index) => (
-                  <EventCard
-                    distanceMiles={distanceMiles}
-                    event={event}
-                    key={event.id}
-                    resultPosition={index + 1}
-                  />
-                ))}
+                {exactResults.map(
+                  ({ event, distanceMiles, matchingChildAges }, index) => (
+                    <EventCard
+                      distanceMiles={distanceMiles}
+                      event={event}
+                      key={event.id}
+                      matchingChildAges={matchingChildAges}
+                      resultPosition={index + 1}
+                    />
+                  ),
+                )}
               </div>
             </section>
           )}
@@ -142,15 +154,18 @@ async function ResultsContent({ searchParams }: ResultsPageProps) {
                 These options broaden the distance and time of day.
               </p>
               <div className="space-y-4">
-                {flexibleResults.map(({ event, distanceMiles }, index) => (
-                  <EventCard
-                    distanceMiles={distanceMiles}
-                    event={event}
-                    flexible
-                    key={event.id}
-                    resultPosition={exactResults.length + index + 1}
-                  />
-                ))}
+                {flexibleResults.map(
+                  ({ event, distanceMiles, matchingChildAges }, index) => (
+                    <EventCard
+                      distanceMiles={distanceMiles}
+                      event={event}
+                      flexible
+                      key={event.id}
+                      matchingChildAges={matchingChildAges}
+                      resultPosition={exactResults.length + index + 1}
+                    />
+                  ),
+                )}
               </div>
             </section>
           )}

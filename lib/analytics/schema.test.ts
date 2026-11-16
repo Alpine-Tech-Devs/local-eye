@@ -23,7 +23,7 @@ describe("AnalyticsRequestSchema", () => {
         eventType: "search",
         payload: {
           filters: {
-            childAge: 3,
+            childAges: [3, 6],
             date: { preset: "weekend" },
             timeOfDay: "morning",
             maxDistanceMiles: 25,

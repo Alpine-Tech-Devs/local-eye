@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft, ArrowRight, Map, MapPin, Search } from "lucide-react";
+import { ArrowLeft, ArrowRight, Map, MapPin, Plus, Search } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useTransition } from "react";
@@ -36,6 +36,15 @@ const TIME_OPTIONS = [
   { value: "anytime", label: "Anytime" },
 ] as const;
 const DISTANCE_OPTIONS = [10, 15, 25, 40] as const;
+const CHILD_AGE_OPTIONS = [
+  { value: "", label: "Any age" },
+  { value: "0", label: "Under 1" },
+  ...Array.from({ length: 11 }, (_, index) => index + 1).map((age) => ({
+    value: String(age),
+    label: `${age} ${age === 1 ? "year" : "years"}`,
+  })),
+  { value: "12", label: "12+" },
+];
 const BUDGET_LABELS: Record<Budget, string> = {
   free: "Free",
   under10: "Under $10",
@@ -61,6 +70,10 @@ function todayAsIsoDate() {
   return `${year}-${month}-${day}`;
 }
 
+function getChildAgeSelections(childAges: number[]): Array<number | ""> {
+  return childAges.length > 0 ? childAges : [""];
+}
+
 function getStoredFilters(): SearchFilters | null {
   try {
     const stored = window.localStorage.getItem(STORAGE_KEY);
@@ -79,6 +92,9 @@ function getStoredFilters(): SearchFilters | null {
 export function SearchForm({ initialFilters, hasUrlFilters }: SearchFormProps) {
   const router = useRouter();
   const [filters, setFilters] = useState(initialFilters);
+  const [childAgeSelections, setChildAgeSelections] = useState<
+    Array<number | "">
+  >(() => getChildAgeSelections(initialFilters.childAges));
   const [step, setStep] = useState(0);
   const [isPending, startTransition] = useTransition();
   const [validationMessage, setValidationMessage] = useState("");
@@ -88,13 +104,43 @@ export function SearchForm({ initialFilters, hasUrlFilters }: SearchFormProps) {
     const storedFilters = getStoredFilters();
     if (!storedFilters) return;
 
-    const timer = window.setTimeout(() => setFilters(storedFilters), 0);
+    const timer = window.setTimeout(() => {
+      setFilters(storedFilters);
+      setChildAgeSelections(getChildAgeSelections(storedFilters.childAges));
+    }, 0);
     return () => window.clearTimeout(timer);
   }, [hasUrlFilters]);
 
   function updateFilters(update: Partial<SearchFilters>) {
     setFilters((current) => ({ ...current, ...update }));
     setValidationMessage("");
+  }
+
+  function updateChildAge(index: number, value: number | "") {
+    const nextSelections = childAgeSelections.map((age, currentIndex) =>
+      currentIndex === index ? value : age,
+    );
+    setChildAgeSelections(nextSelections);
+    updateFilters({
+      childAges: nextSelections.filter((age): age is number => age !== ""),
+    });
+  }
+
+  function addChildAge() {
+    setChildAgeSelections((current) => [...current, ""]);
+    setValidationMessage("");
+  }
+
+  function removeChildAge(index: number) {
+    const nextSelections = childAgeSelections.filter(
+      (_, currentIndex) => currentIndex !== index,
+    );
+    const selections: Array<number | ""> =
+      nextSelections.length > 0 ? nextSelections : [""];
+    setChildAgeSelections(selections);
+    updateFilters({
+      childAges: selections.filter((age): age is number => age !== ""),
+    });
   }
 
   function selectDate(preset: DateFilter["preset"]) {
@@ -237,33 +283,64 @@ export function SearchForm({ initialFilters, hasUrlFilters }: SearchFormProps) {
                   <legend className="text-2xl font-semibold tracking-tight text-slate-950 sm:text-3xl">
                     Who&apos;s going?
                   </legend>
-                  <label className="mt-7 block max-w-sm text-sm font-medium text-slate-700">
-                    Child&apos;s age
-                    <select
-                      autoFocus
-                      className="mt-2 min-h-12 w-full rounded-lg border border-slate-300 bg-white px-3 text-base focus:border-orange-500 focus:outline-2 focus:outline-orange-500"
-                      value={filters.childAge ?? ""}
-                      onChange={(event) =>
-                        updateFilters({
-                          childAge:
-                            event.target.value === ""
-                              ? undefined
-                              : Number(event.target.value),
-                        })
-                      }
+                  <p className="mt-3 text-sm text-slate-600">
+                    We&apos;ll show events suitable for at least one selected
+                    age. Leave an age as Any age to ignore it.
+                  </p>
+                  <div className="mt-6 max-w-sm space-y-4">
+                    {childAgeSelections.map((age, index) => (
+                      <div
+                        className="rounded-xl border border-slate-200 bg-white p-4"
+                        key={index}
+                      >
+                        <div className="mb-3 flex items-center justify-between">
+                          <span className="text-sm font-semibold text-slate-800">
+                            Child {index + 1}
+                          </span>
+                          {childAgeSelections.length > 1 && (
+                            <button
+                              aria-label={`Remove child ${index + 1}`}
+                              className="min-h-10 rounded-md px-2 text-sm font-medium text-orange-700 underline decoration-orange-200 underline-offset-2 hover:text-orange-900 focus-visible:outline-2 focus-visible:outline-orange-500"
+                              onClick={() => removeChildAge(index)}
+                              type="button"
+                            >
+                              Remove
+                            </button>
+                          )}
+                        </div>
+                        <label className="block text-sm font-medium text-slate-700">
+                          Age
+                          <select
+                            autoFocus={index === 0}
+                            className="mt-2 min-h-12 w-full rounded-lg border border-slate-300 bg-white px-3 text-base focus:border-orange-500 focus:outline-2 focus:outline-orange-500"
+                            value={age}
+                            onChange={(event) =>
+                              updateChildAge(
+                                index,
+                                event.target.value === ""
+                                  ? ""
+                                  : Number(event.target.value),
+                              )
+                            }
+                          >
+                            {CHILD_AGE_OPTIONS.map((option) => (
+                              <option key={option.value} value={option.value}>
+                                {option.label}
+                              </option>
+                            ))}
+                          </select>
+                        </label>
+                      </div>
+                    ))}
+                    <button
+                      className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-orange-200 px-4 text-sm font-semibold text-orange-800 hover:bg-orange-50 focus-visible:outline-2 focus-visible:outline-orange-500"
+                      onClick={addChildAge}
+                      type="button"
                     >
-                      <option value="">Any age</option>
-                      <option value="0">Under 1</option>
-                      {Array.from({ length: 11 }, (_, index) => index + 1).map(
-                        (age) => (
-                          <option key={age} value={age}>
-                            {age} {age === 1 ? "year" : "years"}
-                          </option>
-                        ),
-                      )}
-                      <option value="12">12+</option>
-                    </select>
-                  </label>
+                      <Plus aria-hidden="true" className="size-4" />
+                      Add another child
+                    </button>
+                  </div>
                 </fieldset>
               )}
 
