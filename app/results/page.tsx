@@ -4,6 +4,7 @@ import Link from "next/link";
 
 import { EventCard } from "@/components/events/EventCard";
 import { AtHomeCallout } from "@/components/AtHomeCallout";
+import { ContactActions } from "@/components/ContactActions";
 import { SiteHeader } from "@/components/SiteHeader";
 import {
   filtersToSearchParams,
@@ -200,9 +201,30 @@ async function ResultsContent({ searchParams }: ResultsPageProps) {
                   Change answers
                 </Link>
               </div>
+              <div className="mt-6 border-t border-slate-200 pt-5">
+                <p className="text-sm font-semibold text-slate-900">
+                  Have an event we&apos;re missing, or an idea to improve the app?
+                </p>
+                <p className="mt-1 text-sm leading-6 text-slate-600">
+                  We&apos;d love to hear from you.
+                </p>
+                <ContactActions className="mt-4" />
+              </div>
             </section>
           )}
         </div>
+
+        {(exactResults.length > 0 || flexibleResults.length > 0) && (
+          <aside className="mt-10 rounded-xl border border-orange-100 bg-orange-50/60 p-5 sm:p-6">
+            <p className="font-semibold text-slate-900">
+              Have an event we&apos;re missing, or an idea to improve the app?
+            </p>
+            <p className="mt-1 text-sm leading-6 text-slate-600">
+              We&apos;d love to hear from you.
+            </p>
+            <ContactActions className="mt-4" />
+          </aside>
+        )}
 
         <AtHomeCallout className="mt-10" />
       </main>
