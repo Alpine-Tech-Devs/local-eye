@@ -46,6 +46,17 @@ describe("SearchFilters URL serialization", () => {
     });
   });
 
+  it.each(["next3days", "next5days"] as const)(
+    "round-trips the %s date preset",
+    (preset) => {
+      const filters = { ...DEFAULT_SEARCH_FILTERS, date: { preset } };
+
+      expect(
+        parseFiltersFromSearchParams(filtersToSearchParams(filters)),
+      ).toEqual(filters);
+    },
+  );
+
   it("continues to parse legacy single-age URLs and saved filters", () => {
     expect(
       parseFiltersFromSearchParams({

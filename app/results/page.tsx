@@ -46,6 +46,12 @@ function getSearchSummary(
     case "weekend":
       date = "this weekend";
       break;
+    case "next3days":
+      date = "the next 3 days";
+      break;
+    case "next5days":
+      date = "the next 5 days";
+      break;
     case "custom":
       date = new Intl.DateTimeFormat("en-US", {
         month: "long",

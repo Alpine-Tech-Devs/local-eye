@@ -6,7 +6,15 @@ const searchPayload = z.object({
   filters: z.object({
     childAges: z.array(z.number().int().min(0).max(18)).default([]),
     date: z.discriminatedUnion("preset", [
-      z.object({ preset: z.enum(["today", "tomorrow", "weekend"]) }),
+      z.object({
+        preset: z.enum([
+          "today",
+          "tomorrow",
+          "weekend",
+          "next3days",
+          "next5days",
+        ]),
+      }),
       z.object({ preset: z.literal("custom"), date: z.iso.date() }),
     ]),
     timeOfDay: z.enum(["morning", "afternoon", "evening", "anytime"]),

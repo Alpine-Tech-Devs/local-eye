@@ -36,6 +36,28 @@ describe("AnalyticsRequestSchema", () => {
     ).toBe(true);
   });
 
+  it.each(["next3days", "next5days"] as const)(
+    "accepts searches for %s",
+    (preset) => {
+      expect(
+        AnalyticsRequestSchema.safeParse({
+          anonId: ANON_ID,
+          eventType: "search",
+          payload: {
+            filters: {
+              date: { preset },
+              timeOfDay: "anytime",
+              maxDistanceMiles: 25,
+              budget: "any",
+              environment: "either",
+              origin: "portsmouth",
+            },
+          },
+        }).success,
+      ).toBe(true);
+    },
+  );
+
   it("rejects precise coordinates in search analytics", () => {
     const result = AnalyticsRequestSchema.safeParse({
       anonId: ANON_ID,

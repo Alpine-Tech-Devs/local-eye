@@ -16,6 +16,19 @@ describe("matchesTimeOfDay", () => {
 });
 
 describe("resolveDateRange", () => {
+  it.each([
+    ["next3days", "2026-11-06T05:00:00.000Z"],
+    ["next5days", "2026-11-08T05:00:00.000Z"],
+  ] as const)("resolves %s including today", (preset, expectedEnd) => {
+    const range = resolveDateRange(
+      { preset },
+      new Date("2026-11-03T15:00:00.000Z"),
+    );
+
+    expect(range.start.toISOString()).toBe("2026-11-03T05:00:00.000Z");
+    expect(range.end.toISOString()).toBe(expectedEnd);
+  });
+
   it("resolves today and tomorrow as New York calendar days", () => {
     const now = new Date("2026-10-27T03:30:00Z");
     const today = resolveDateRange({ preset: "today" }, now);

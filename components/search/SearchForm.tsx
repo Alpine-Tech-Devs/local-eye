@@ -26,7 +26,8 @@ import {
 const STORAGE_KEY = "little-plans:search-filters";
 const DATE_OPTIONS = [
   { value: "today", label: "Today" },
-  { value: "tomorrow", label: "Tomorrow" },
+  { value: "next3days", label: "Next 3 days" },
+  { value: "next5days", label: "Next 5 days" },
   { value: "weekend", label: "This weekend" },
 ] as const;
 const TIME_OPTIONS = [

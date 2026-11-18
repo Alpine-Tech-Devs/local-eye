@@ -18,7 +18,9 @@ export const ENVIRONMENT_OPTIONS = ["indoor", "outdoor", "either"] as const;
 export type Environment = (typeof ENVIRONMENT_OPTIONS)[number];
 
 export type DateFilter =
-  | { preset: "today" | "tomorrow" | "weekend" }
+  | {
+      preset: "today" | "tomorrow" | "weekend" | "next3days" | "next5days";
+    }
   | { preset: "custom"; date: string };
 
 export type EventOrigin = string | GeoPoint;
@@ -34,9 +36,9 @@ export interface SearchFilters {
 }
 
 const dateFilterSchema = z.discriminatedUnion("preset", [
-  z.object({ preset: z.literal("today") }),
-  z.object({ preset: z.literal("tomorrow") }),
-  z.object({ preset: z.literal("weekend") }),
+  z.object({
+    preset: z.enum(["today", "tomorrow", "weekend", "next3days", "next5days"]),
+  }),
   z.object({ preset: z.literal("custom"), date: z.iso.date() }),
 ]);
 
