@@ -82,6 +82,15 @@ function freshnessScore(lastVerifiedAt: string | null, now: Date): number {
   return Math.max(0, 10 * (1 - ageInDays / 180));
 }
 
+function environmentPreference(
+  event: Event,
+  environment: SearchFilters["environment"],
+): number {
+  return environment !== "either" && event.indoorOutdoor === environment
+    ? 1
+    : 0;
+}
+
 export function getRelaxedSearchFilters(filters: SearchFilters): SearchFilters {
   return {
     ...filters,
@@ -148,9 +157,9 @@ export function rankEvents(
   const origin = getOriginPoint(filters.origin);
 
   /**
-   * Weighted 100-point score: age fit (6-30), distance (linear to zero at the
-   * distance cap), time-window proximity (0-20), free bonus (10), and freshness
-   * (10 decaying linearly to zero over 180 days). Ties prefer earlier events.
+   * Exact indoor/outdoor matches sort first. The weighted score then uses age
+   * fit (6-30), distance, time-window proximity (0-20), free bonus (10), and
+   * freshness (10 decaying linearly to zero over 180 days).
    */
   return events
     .map((event) => {
@@ -173,6 +182,8 @@ export function rankEvents(
     })
     .sort(
       (a, b) =>
+        environmentPreference(b.event, filters.environment) -
+          environmentPreference(a.event, filters.environment) ||
         b.score - a.score ||
         Date.parse(a.event.startDateTime) - Date.parse(b.event.startDateTime) ||
         a.event.title.localeCompare(b.event.title) ||

@@ -110,6 +110,53 @@ describe("matchesEventFilters", () => {
 });
 
 describe("rankEvents", () => {
+  it.each(["indoor", "outdoor"] as const)(
+    "ranks exact %s matches ahead of events marked either",
+    (environment) => {
+      const filters = makeFilters({
+        environment,
+        maxDistanceMiles: 25,
+        timeOfDay: "anytime",
+      });
+      const exactMatch = makeEvent({
+        id: "00000000-0000-4000-8000-000000000002",
+        indoorOutdoor: environment,
+        latitude: 43.2,
+        longitude: -70.9,
+      });
+      const eitherMatch = makeEvent({
+        indoorOutdoor: "either",
+      });
+
+      expect(
+        rankEvents([eitherMatch, exactMatch], filters, NOW).map(
+          ({ event }) => event.id,
+        ),
+      ).toEqual([exactMatch.id, eitherMatch.id]);
+    },
+  );
+
+  it("does not prefer an environment when either is selected", () => {
+    const filters = makeFilters({
+      environment: "either",
+      maxDistanceMiles: 25,
+      timeOfDay: "anytime",
+    });
+    const fartherIndoor = makeEvent({
+      indoorOutdoor: "indoor",
+      latitude: 43.2,
+      longitude: -70.9,
+    });
+    const nearbyOutdoor = makeEvent({
+      id: "00000000-0000-4000-8000-000000000002",
+      indoorOutdoor: "outdoor",
+    });
+
+    expect(
+      rankEvents([fartherIndoor, nearbyOutdoor], filters, NOW)[0].event,
+    ).toEqual(nearbyOutdoor);
+  });
+
   it("ranks relevant age, distance, time, free, and fresh events above weaker matches", () => {
     const filters = makeFilters({
       childAges: [3],

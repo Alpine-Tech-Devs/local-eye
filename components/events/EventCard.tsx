@@ -96,12 +96,7 @@ export function EventCard({
   flexible = false,
   resultPosition,
 }: EventCardProps) {
-  const SettingIcon =
-    event.indoorOutdoor === "indoor"
-      ? Building2
-      : event.indoorOutdoor === "outdoor"
-        ? Trees
-        : MapPin;
+  const SettingIcon = event.indoorOutdoor === "outdoor" ? Trees : Building2;
   const categoryStyle =
     CATEGORY_STYLES[event.category] ?? CATEGORY_STYLES.Other;
   const imageUrl = getTrustedEventImageUrl(event.imageUrl);
@@ -189,10 +184,23 @@ export function EventCard({
             </span>
           </p>
           <p className="flex items-center gap-2">
-            <SettingIcon
-              aria-hidden="true"
-              className="size-4 shrink-0 text-orange-500"
-            />
+            {event.indoorOutdoor === "either" ? (
+              <span className="flex shrink-0 items-center gap-0.5">
+                <Building2
+                  aria-hidden="true"
+                  className="size-4 text-orange-500"
+                />
+                <Trees
+                  aria-hidden="true"
+                  className="size-4 text-orange-500"
+                />
+              </span>
+            ) : (
+              <SettingIcon
+                aria-hidden="true"
+                className="size-4 shrink-0 text-orange-500"
+              />
+            )}
             <span className="capitalize">{event.indoorOutdoor}</span>
           </p>
         </div>
