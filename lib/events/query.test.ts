@@ -91,7 +91,7 @@ describe("searchEvents", () => {
     );
   });
 
-  it("supports limiting the initial suggestions to three", async () => {
+  it("supports limiting the initial suggestions", async () => {
     mockCandidateRows(
       Array.from({ length: 5 }, (_, index) => ({
         ...EVENT_ROW,
@@ -107,6 +107,43 @@ describe("searchEvents", () => {
     expect(result.initialResults).toHaveLength(3);
     expect(result.totalResults).toBe(5);
     expect(result.hasMore).toBe(true);
+  });
+
+  it("returns consecutive result pages in the ranked order", async () => {
+    const rows = Array.from({ length: 11 }, (_, index) => ({
+      ...EVENT_ROW,
+      id: `00000000-0000-4000-8000-${String(index + 1).padStart(12, "0")}`,
+      title: `Storytime ${index + 1}`,
+    }));
+    mockCandidateRows(rows);
+
+    const firstPage = await searchEvents(makeFilters(), {
+      now: NOW,
+      limit: 5,
+    });
+    const secondPage = await searchEvents(makeFilters(), {
+      now: NOW,
+      limit: 5,
+      offset: 5,
+    });
+    const lastPage = await searchEvents(makeFilters(), {
+      now: NOW,
+      limit: 5,
+      offset: 10,
+    });
+
+    expect(firstPage.initialResults.map(({ event }) => event.id)).toEqual(
+      firstPage.results.slice(0, 5).map(({ event }) => event.id),
+    );
+    expect(secondPage.initialResults.map(({ event }) => event.id)).toEqual(
+      firstPage.results.slice(5, 10).map(({ event }) => event.id),
+    );
+    expect(lastPage.initialResults.map(({ event }) => event.id)).toEqual(
+      firstPage.results.slice(10).map(({ event }) => event.id),
+    );
+    expect(firstPage.hasMore).toBe(true);
+    expect(secondPage.hasMore).toBe(true);
+    expect(lastPage.hasMore).toBe(false);
   });
 
   it("returns additional nearby events as relaxed suggestions when exact results are sparse", async () => {

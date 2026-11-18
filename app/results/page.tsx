@@ -5,12 +5,14 @@ import Link from "next/link";
 import { EventCard } from "@/components/events/EventCard";
 import { AtHomeCallout } from "@/components/AtHomeCallout";
 import { ContactActions } from "@/components/ContactActions";
+import { InfiniteEventResults } from "@/components/events/InfiniteEventResults";
 import { SiteHeader } from "@/components/SiteHeader";
 import {
   filtersToSearchParams,
   parseFiltersFromSearchParams,
 } from "@/lib/events/filters";
 import { searchEvents } from "@/lib/events/query";
+import { EVENT_SEARCH_PAGE_SIZE } from "@/lib/events/search-page";
 import { EVENT_TIME_ZONE } from "@/lib/events/time";
 import { getTownBySlug } from "@/lib/geo/towns";
 import ResultsLoading from "./loading";
@@ -78,10 +80,16 @@ function makeSearchHref(
 async function ResultsContent({ searchParams }: ResultsPageProps) {
   const params = await searchParams;
   const filters = parseFiltersFromSearchParams(params);
-  const search = await searchEvents(filters, { limit: 3 });
+  const searchTime = new Date();
+  const search = await searchEvents(filters, {
+    now: searchTime,
+    limit: EVENT_SEARCH_PAGE_SIZE,
+  });
   const exactResults = search.initialResults;
   const remainingSlots = Math.max(0, 3 - exactResults.length);
   const flexibleResults = search.relaxedSuggestions.slice(0, remainingSlots);
+  const resultSearchParams = filtersToSearchParams(filters);
+  resultSearchParams.set("asOf", searchTime.toISOString());
   const editHref = `/?${filtersToSearchParams(filters).toString()}`;
   const widenedDistance = Math.min(
     500,
@@ -131,19 +139,13 @@ async function ResultsContent({ searchParams }: ResultsPageProps) {
               >
                 {search.totalResults === 1 ? "Your match" : "Best matches"}
               </h2>
-              <div className="space-y-4">
-                {exactResults.map(
-                  ({ event, distanceMiles, matchingChildAges }, index) => (
-                    <EventCard
-                      distanceMiles={distanceMiles}
-                      event={event}
-                      key={event.id}
-                      matchingChildAges={matchingChildAges}
-                      resultPosition={index + 1}
-                    />
-                  ),
-                )}
-              </div>
+              <InfiniteEventResults
+                initialHasMore={search.hasMore}
+                initialResults={exactResults}
+                initialTotalResults={search.totalResults}
+                key={resultSearchParams.toString()}
+                searchParams={resultSearchParams.toString()}
+              />
             </section>
           )}
 

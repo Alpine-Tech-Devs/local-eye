@@ -81,7 +81,7 @@ describe("AnalyticsRequestSchema", () => {
     const resultClick = AnalyticsRequestSchema.safeParse({
       anonId: ANON_ID,
       eventType: "result_click",
-      payload: { eventId: EVENT_ID, position: 3 },
+      payload: { eventId: EVENT_ID, position: 5 },
     });
     const unsave = AnalyticsRequestSchema.safeParse({
       anonId: ANON_ID,
@@ -93,11 +93,16 @@ describe("AnalyticsRequestSchema", () => {
     expect(unsave.success).toBe(true);
   });
 
-  it("rejects out-of-range result positions and unknown event types", () => {
+  it("rejects invalid result positions and unknown event types", () => {
     const invalidPosition = AnalyticsRequestSchema.safeParse({
       anonId: ANON_ID,
       eventType: "result_click",
-      payload: { eventId: EVENT_ID, position: 4 },
+      payload: { eventId: EVENT_ID, position: 0 },
+    });
+    const unsafePosition = AnalyticsRequestSchema.safeParse({
+      anonId: ANON_ID,
+      eventType: "result_click",
+      payload: { eventId: EVENT_ID, position: 1001 },
     });
     const invalidType = AnalyticsRequestSchema.safeParse({
       anonId: ANON_ID,
@@ -106,6 +111,7 @@ describe("AnalyticsRequestSchema", () => {
     });
 
     expect(invalidPosition.success).toBe(false);
+    expect(unsafePosition.success).toBe(false);
     expect(invalidType.success).toBe(false);
   });
 });

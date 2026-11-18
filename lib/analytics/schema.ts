@@ -50,7 +50,7 @@ export const AnalyticsRequestSchema = z.discriminatedUnion("eventType", [
     anonId: eventId,
     eventType: z.literal("result_click"),
     payload: eventPayload.extend({
-      position: z.number().int().min(1).max(3),
+      position: z.number().int().min(1).max(1000),
     }),
   }),
   ...(["source_click", "registration_click", "save", "unsave"] as const).map(
