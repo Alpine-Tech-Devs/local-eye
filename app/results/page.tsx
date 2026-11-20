@@ -4,12 +4,15 @@ import Link from "next/link";
 
 import { EventCard } from "@/components/events/EventCard";
 import { AtHomeCallout } from "@/components/AtHomeCallout";
+import { ContactActions } from "@/components/ContactActions";
+import { InfiniteEventResults } from "@/components/events/InfiniteEventResults";
 import { SiteHeader } from "@/components/SiteHeader";
 import {
   filtersToSearchParams,
   parseFiltersFromSearchParams,
 } from "@/lib/events/filters";
 import { searchEvents } from "@/lib/events/query";
+import { EVENT_SEARCH_PAGE_SIZE } from "@/lib/events/search-page";
 import { EVENT_TIME_ZONE } from "@/lib/events/time";
 import { getTownBySlug } from "@/lib/geo/towns";
 import ResultsLoading from "./loading";
@@ -18,13 +21,22 @@ interface ResultsPageProps {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }
 
+function formatChildAge(age: number) {
+  if (age === 0) return "under 1";
+  if (age === 12) return "12+";
+  return String(age);
+}
+
 function getSearchSummary(
   filters: ReturnType<typeof parseFiltersFromSearchParams>,
 ) {
+  const childAges = [...new Set(filters.childAges)].sort((a, b) => a - b);
   const age =
-    filters.childAge === undefined
+    childAges.length === 0
       ? "any age"
-      : `${filters.childAge === 0 ? "under 1" : `${filters.childAge}-year-old`}`;
+      : childAges.length === 1
+        ? `age ${formatChildAge(childAges[0])}`
+        : `ages ${childAges.map(formatChildAge).join(" or ")}`;
   let date: string;
   switch (filters.date.preset) {
     case "today":
@@ -35,6 +47,12 @@ function getSearchSummary(
       break;
     case "weekend":
       date = "this weekend";
+      break;
+    case "next3days":
+      date = "the next 3 days";
+      break;
+    case "next5days":
+      date = "the next 5 days";
       break;
     case "custom":
       date = new Intl.DateTimeFormat("en-US", {
@@ -62,10 +80,16 @@ function makeSearchHref(
 async function ResultsContent({ searchParams }: ResultsPageProps) {
   const params = await searchParams;
   const filters = parseFiltersFromSearchParams(params);
-  const search = await searchEvents(filters, { limit: 3 });
+  const searchTime = new Date();
+  const search = await searchEvents(filters, {
+    now: searchTime,
+    limit: EVENT_SEARCH_PAGE_SIZE,
+  });
   const exactResults = search.initialResults;
   const remainingSlots = Math.max(0, 3 - exactResults.length);
   const flexibleResults = search.relaxedSuggestions.slice(0, remainingSlots);
+  const resultSearchParams = filtersToSearchParams(filters);
+  resultSearchParams.set("asOf", searchTime.toISOString());
   const editHref = `/?${filtersToSearchParams(filters).toString()}`;
   const widenedDistance = Math.min(
     500,
@@ -115,16 +139,13 @@ async function ResultsContent({ searchParams }: ResultsPageProps) {
               >
                 {search.totalResults === 1 ? "Your match" : "Best matches"}
               </h2>
-              <div className="space-y-4">
-                {exactResults.map(({ event, distanceMiles }, index) => (
-                  <EventCard
-                    distanceMiles={distanceMiles}
-                    event={event}
-                    key={event.id}
-                    resultPosition={index + 1}
-                  />
-                ))}
-              </div>
+              <InfiniteEventResults
+                initialHasMore={search.hasMore}
+                initialResults={exactResults}
+                initialTotalResults={search.totalResults}
+                key={resultSearchParams.toString()}
+                searchParams={resultSearchParams.toString()}
+              />
             </section>
           )}
 
@@ -142,15 +163,18 @@ async function ResultsContent({ searchParams }: ResultsPageProps) {
                 These options broaden the distance and time of day.
               </p>
               <div className="space-y-4">
-                {flexibleResults.map(({ event, distanceMiles }, index) => (
-                  <EventCard
-                    distanceMiles={distanceMiles}
-                    event={event}
-                    flexible
-                    key={event.id}
-                    resultPosition={exactResults.length + index + 1}
-                  />
-                ))}
+                {flexibleResults.map(
+                  ({ event, distanceMiles, matchingChildAges }, index) => (
+                    <EventCard
+                      distanceMiles={distanceMiles}
+                      event={event}
+                      flexible
+                      key={event.id}
+                      matchingChildAges={matchingChildAges}
+                      resultPosition={exactResults.length + index + 1}
+                    />
+                  ),
+                )}
               </div>
             </section>
           )}
@@ -185,9 +209,30 @@ async function ResultsContent({ searchParams }: ResultsPageProps) {
                   Change answers
                 </Link>
               </div>
+              <div className="mt-6 border-t border-slate-200 pt-5">
+                <p className="text-sm font-semibold text-slate-900">
+                  Have an event we&apos;re missing, or an idea to improve the app?
+                </p>
+                <p className="mt-1 text-sm leading-6 text-slate-600">
+                  We&apos;d love to hear from you.
+                </p>
+                <ContactActions className="mt-4" />
+              </div>
             </section>
           )}
         </div>
+
+        {(exactResults.length > 0 || flexibleResults.length > 0) && (
+          <aside className="mt-10 rounded-xl border border-orange-100 bg-orange-50/60 p-5 sm:p-6">
+            <p className="font-semibold text-slate-900">
+              Have an event we&apos;re missing, or an idea to improve the app?
+            </p>
+            <p className="mt-1 text-sm leading-6 text-slate-600">
+              We&apos;d love to hear from you.
+            </p>
+            <ContactActions className="mt-4" />
+          </aside>
+        )}
 
         <AtHomeCallout className="mt-10" />
       </main>

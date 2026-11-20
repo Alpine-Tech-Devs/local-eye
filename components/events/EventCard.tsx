@@ -75,8 +75,15 @@ function formatAges(event: Event) {
   return `Ages ${event.minAge}–${event.maxAge}`;
 }
 
+function formatMatchingAge(age: number) {
+  if (age === 0) return "under 1";
+  if (age === 12) return "12+";
+  return String(age);
+}
+
 export interface EventCardProps {
   event: Event;
+  matchingChildAges?: number[];
   distanceMiles?: number;
   flexible?: boolean;
   resultPosition?: number;
@@ -84,16 +91,12 @@ export interface EventCardProps {
 
 export function EventCard({
   event,
+  matchingChildAges = [],
   distanceMiles,
   flexible = false,
   resultPosition,
 }: EventCardProps) {
-  const SettingIcon =
-    event.indoorOutdoor === "indoor"
-      ? Building2
-      : event.indoorOutdoor === "outdoor"
-        ? Trees
-        : MapPin;
+  const SettingIcon = event.indoorOutdoor === "outdoor" ? Trees : Building2;
   const categoryStyle =
     CATEGORY_STYLES[event.category] ?? CATEGORY_STYLES.Other;
   const imageUrl = getTrustedEventImageUrl(event.imageUrl);
@@ -181,10 +184,23 @@ export function EventCard({
             </span>
           </p>
           <p className="flex items-center gap-2">
-            <SettingIcon
-              aria-hidden="true"
-              className="size-4 shrink-0 text-orange-500"
-            />
+            {event.indoorOutdoor === "either" ? (
+              <span className="flex shrink-0 items-center gap-0.5">
+                <Building2
+                  aria-hidden="true"
+                  className="size-4 text-orange-500"
+                />
+                <Trees
+                  aria-hidden="true"
+                  className="size-4 text-orange-500"
+                />
+              </span>
+            ) : (
+              <SettingIcon
+                aria-hidden="true"
+                className="size-4 shrink-0 text-orange-500"
+              />
+            )}
             <span className="capitalize">{event.indoorOutdoor}</span>
           </p>
         </div>
@@ -193,6 +209,14 @@ export function EventCard({
           <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-700">
             {formatAges(event)}
           </span>
+          {matchingChildAges.map((age) => (
+            <span
+              className="rounded-full bg-orange-50 px-3 py-1 text-xs font-medium text-orange-800"
+              key={age}
+            >
+              Matches age {formatMatchingAge(age)}
+            </span>
+          ))}
           {event.registrationRequired && (
             <span className="rounded-full bg-amber-50 px-3 py-1 text-xs font-medium text-amber-900">
               Registration required

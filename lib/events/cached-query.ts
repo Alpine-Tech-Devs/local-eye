@@ -6,13 +6,16 @@ import type { Database } from "@/lib/supabase/database.types";
 
 function getCoarseFilterAlternatives(filters: SearchFilters): string[][] {
   const groups: string[][] = [];
-  if (filters.childAge !== undefined) {
-    const age = filters.childAge;
+  if (filters.childAges.length > 0) {
     groups.push([
-      "min_age.is.null,max_age.is.null",
-      `min_age.is.null,max_age.gte.${age}`,
-      `min_age.lte.${age},max_age.is.null`,
-      `min_age.lte.${age},max_age.gte.${age}`,
+      ...new Set(
+        [...new Set(filters.childAges)].flatMap((age) => [
+          "min_age.is.null,max_age.is.null",
+          `min_age.is.null,max_age.gte.${age}`,
+          `min_age.lte.${age},max_age.is.null`,
+          `min_age.lte.${age},max_age.gte.${age}`,
+        ]),
+      ),
     ]);
   }
 

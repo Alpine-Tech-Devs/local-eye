@@ -4,9 +4,17 @@ const eventId = z.uuid();
 
 const searchPayload = z.object({
   filters: z.object({
-    childAge: z.number().int().min(0).max(18).optional(),
+    childAges: z.array(z.number().int().min(0).max(18)).default([]),
     date: z.discriminatedUnion("preset", [
-      z.object({ preset: z.enum(["today", "tomorrow", "weekend"]) }),
+      z.object({
+        preset: z.enum([
+          "today",
+          "tomorrow",
+          "weekend",
+          "next3days",
+          "next5days",
+        ]),
+      }),
       z.object({ preset: z.literal("custom"), date: z.iso.date() }),
     ]),
     timeOfDay: z.enum(["morning", "afternoon", "evening", "anytime"]),
@@ -42,7 +50,7 @@ export const AnalyticsRequestSchema = z.discriminatedUnion("eventType", [
     anonId: eventId,
     eventType: z.literal("result_click"),
     payload: eventPayload.extend({
-      position: z.number().int().min(1).max(3),
+      position: z.number().int().min(1).max(1000),
     }),
   }),
   ...(["source_click", "registration_click", "save", "unsave"] as const).map(

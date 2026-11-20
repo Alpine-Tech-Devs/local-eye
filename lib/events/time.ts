@@ -43,6 +43,15 @@ export function resolveDateRange(
     case "tomorrow":
       localStart = startOfDay(addDays(zonedNow, 1));
       break;
+    case "next3days":
+    case "next5days": {
+      const days = dateFilter.preset === "next3days" ? 3 : 5;
+      localStart = startOfDay(zonedNow);
+      return {
+        start: fromZonedTime(localStart, timeZone),
+        end: fromZonedTime(addDays(localStart, days), timeZone),
+      };
+    }
     case "weekend": {
       const day = zonedNow.getDay();
       const daysUntilSaturday = day === 0 ? -1 : 6 - day;

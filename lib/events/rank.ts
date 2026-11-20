@@ -3,11 +3,7 @@ import { toZonedTime } from "date-fns-tz";
 import { getTownBySlug } from "../geo/towns";
 import { haversineMiles } from "../geo/haversine";
 import type { SearchFilters } from "./filters";
-import {
-  EVENT_TIME_ZONE,
-  matchesTimeOfDay,
-  resolveDateRange,
-} from "./time";
+import { EVENT_TIME_ZONE, matchesTimeOfDay, resolveDateRange } from "./time";
 import type { Event, GeoPoint } from "./types";
 
 const TIME_WINDOWS = {
@@ -20,6 +16,7 @@ export interface RankedEvent {
   event: Event;
   distanceMiles: number;
   score: number;
+  matchingChildAges: number[];
 }
 
 function getOriginPoint(origin: SearchFilters["origin"]): GeoPoint {
@@ -30,16 +27,37 @@ function getOriginPoint(origin: SearchFilters["origin"]): GeoPoint {
   return town;
 }
 
-function ageFitScore(event: Event, childAge: number | undefined): number {
-  if (childAge === undefined) return 20;
+export function getMatchingChildAges(
+  event: Event,
+  childAges: readonly number[],
+): number[] {
+  return [...new Set(childAges)]
+    .filter(
+      (age) =>
+        (event.minAge === null || event.minAge <= age) &&
+        (event.maxAge === null || event.maxAge >= age),
+    )
+    .sort((a, b) => a - b);
+}
+
+function ageFitScore(
+  event: Event,
+  childAges: readonly number[],
+  matchingChildAges: readonly number[],
+): number {
+  if (childAges.length === 0) return 20;
 
   if (event.minAge === null && event.maxAge === null) return 18;
-  if (event.minAge === null || event.maxAge === null) return 24;
-
-  const ageRange = event.maxAge - event.minAge;
-  if (ageRange <= 3) return 30;
-  if (ageRange <= 6) return 27;
-  return 24;
+  const ageRangeScore =
+    event.minAge === null || event.maxAge === null
+      ? 24
+      : event.maxAge - event.minAge <= 3
+        ? 30
+        : event.maxAge - event.minAge <= 6
+          ? 27
+          : 24;
+  const ageCoverage = matchingChildAges.length / new Set(childAges).size;
+  return ageRangeScore - 12 * (1 - ageCoverage);
 }
 
 function timeFitScore(
@@ -64,6 +82,15 @@ function freshnessScore(lastVerifiedAt: string | null, now: Date): number {
   return Math.max(0, 10 * (1 - ageInDays / 180));
 }
 
+function environmentPreference(
+  event: Event,
+  environment: SearchFilters["environment"],
+): number {
+  return environment !== "either" && event.indoorOutdoor === environment
+    ? 1
+    : 0;
+}
+
 export function getRelaxedSearchFilters(filters: SearchFilters): SearchFilters {
   return {
     ...filters,
@@ -85,9 +112,8 @@ export function matchesEventFilters(
   if (!matchesTimeOfDay(new Date(start), filters.timeOfDay)) return false;
 
   if (
-    filters.childAge !== undefined &&
-    ((event.minAge !== null && event.minAge > filters.childAge) ||
-      (event.maxAge !== null && event.maxAge < filters.childAge))
+    filters.childAges.length > 0 &&
+    getMatchingChildAges(event, filters.childAges).length === 0
   ) {
     return false;
   }
@@ -131,9 +157,9 @@ export function rankEvents(
   const origin = getOriginPoint(filters.origin);
 
   /**
-   * Weighted 100-point score: age fit (18-30), distance (linear to zero at the
-   * distance cap), time-window proximity (0-20), free bonus (10), and freshness
-   * (10 decaying linearly to zero over 180 days). Ties prefer earlier events.
+   * Exact indoor/outdoor matches sort first. The weighted score then uses age
+   * fit (6-30), distance, time-window proximity (0-20), free bonus (10), and
+   * freshness (10 decaying linearly to zero over 180 days).
    */
   return events
     .map((event) => {
@@ -143,19 +169,21 @@ export function rankEvents(
       });
       const distanceScore =
         30 * Math.max(0, 1 - distanceMiles / filters.maxDistanceMiles);
-      const freeScore =
-        filters.budget !== "any" && event.isFree ? 10 : 0;
+      const freeScore = filters.budget !== "any" && event.isFree ? 10 : 0;
+      const matchingChildAges = getMatchingChildAges(event, filters.childAges);
       const score =
-        ageFitScore(event, filters.childAge) +
+        ageFitScore(event, filters.childAges, matchingChildAges) +
         distanceScore +
         timeFitScore(event.startDateTime, filters.timeOfDay) +
         freeScore +
         freshnessScore(event.lastVerifiedAt, now);
 
-      return { event, distanceMiles, score };
+      return { event, distanceMiles, score, matchingChildAges };
     })
     .sort(
       (a, b) =>
+        environmentPreference(b.event, filters.environment) -
+          environmentPreference(a.event, filters.environment) ||
         b.score - a.score ||
         Date.parse(a.event.startDateTime) - Date.parse(b.event.startDateTime) ||
         a.event.title.localeCompare(b.event.title) ||

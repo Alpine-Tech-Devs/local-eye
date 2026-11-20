@@ -17,6 +17,7 @@ const RELAXED_RESULTS_THRESHOLD = 3;
 export interface SearchEventsOptions {
   now?: Date;
   limit?: number;
+  offset?: number;
 }
 
 export interface SearchEventsResult {
@@ -36,6 +37,13 @@ function validateLimit(limit: number): number {
   return limit;
 }
 
+function validateOffset(offset: number): number {
+  if (!Number.isSafeInteger(offset) || offset < 0) {
+    throw new Error("Search result offset must be a non-negative integer.");
+  }
+  return offset;
+}
+
 function getEffectiveDateStart(filters: SearchFilters, now: Date): Date {
   const { start } = resolveDateRange(filters.date, now);
   return new Date(Math.max(start.getTime(), now.getTime()));
@@ -48,6 +56,7 @@ export async function searchEvents(
   const filters = SearchFiltersSchema.parse(inputFilters);
   const now = options.now ?? new Date();
   const limit = validateLimit(options.limit ?? DEFAULT_RESULT_LIMIT);
+  const offset = validateOffset(options.offset ?? 0);
   const dateRange = resolveDateRange(filters.date, now);
 
   if (getEffectiveDateStart(filters, now) >= dateRange.end) {
@@ -92,9 +101,9 @@ export async function searchEvents(
 
   return {
     results,
-    initialResults: results.slice(0, limit),
+    initialResults: results.slice(offset, offset + limit),
     totalResults: results.length,
-    hasMore: results.length > limit,
+    hasMore: offset + limit < results.length,
     relaxedSuggestions,
     relaxedFilters,
     totalRelaxedSuggestions: relaxedSuggestions.length,

@@ -1,7 +1,9 @@
+import { ContactActions } from "@/components/ContactActions";
+
 export function SiteFooter() {
   return (
     <footer className="mt-auto border-t border-orange-100/80 bg-white/60 backdrop-blur">
-      <div className="mx-auto flex max-w-6xl items-center justify-center px-5 py-4 text-xs text-slate-500 sm:px-8">
+      <div className="mx-auto flex max-w-6xl flex-col items-center gap-2 px-5 py-4 text-xs text-slate-500 sm:flex-row sm:justify-between sm:px-8">
         <p>
           Powered by{" "}
           <a
@@ -13,6 +15,7 @@ export function SiteFooter() {
             Alpine Technologies LLC
           </a>
         </p>
+        <ContactActions compact />
       </div>
     </footer>
   );
